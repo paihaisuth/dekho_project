@@ -4,7 +4,7 @@ import { AuthService } from "@/services/authService";
 import { CustomError } from "@/utils/customError";
 import { NextRequest } from "next/server";
 
-interface IbodyRegister {
+export interface IbodyRegister {
   username: string;
   email: string;
   firstname: string;
