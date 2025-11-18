@@ -6,6 +6,11 @@ import { ObjectId } from "mongodb";
 export class UserRepository implements IuserRepository {
   constructor() {}
 
+  async listUsers(): Promise<Iuser[]> {
+    const users = await userConnection.find().toArray();
+    return users.map((user) => this.mapToEntity(user));
+  }
+
   async getByID(id: string): Promise<Iuser | null> {
     const userQuery = await userConnection.findOne({
       where: { _id: new ObjectId(id) },

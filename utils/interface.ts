@@ -11,6 +11,7 @@ import { EbillStatus, ErepairStatus, EroomStatus, EroomType } from "./enum";
 
 // -------------------- Repository Interface --------------------
 export interface IuserRepository {
+  listUsers(): Promise<Iuser[]>;
   getByID(id: string): Promise<Iuser | null>;
   getByRoleID(roleID: string): Promise<Iuser | null>;
   getByEmail(email: string): Promise<Iuser | null>;
@@ -68,7 +69,7 @@ export interface IreservationRepository {
 }
 
 export interface IroleRepository {
-  list(): Promise<Irole[]>;
+  list(page: number, pageSize: number): Promise<IpaginationFormat<Irole>>;
   getByID(id: string): Promise<Irole | null>;
   createRole(roleInfo: Partial<Irole>): Promise<void>;
   updateRole(id: string, roleInfo: Partial<Irole>): Promise<void>;
@@ -76,6 +77,14 @@ export interface IroleRepository {
 }
 
 // -------------------- Other Interfaces --------------------
+
+export interface IpaginationFormat<T> {
+  page: number;
+  pageSize: number;
+  pageCount: number;
+  totalItems: number;
+  items: T[];
+}
 export interface IauthResponse {
   accessToken: string;
   refreshToken: string;

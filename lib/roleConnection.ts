@@ -1,6 +1,9 @@
 import { Irole } from "@/schema";
 import { mongoClient } from "./mongodb";
 import type { Collection } from "mongodb";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const databaseName = process.env.DATABASE_NAME;
 

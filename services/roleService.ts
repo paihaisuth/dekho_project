@@ -5,8 +5,8 @@ import { IroleRepository, IuserRepository } from "@/utils/interface";
 export class RoleService {
   constructor(private roleRepository: IroleRepository) {}
 
-  async listRoles() {
-    return await this.roleRepository.list();
+  async listRoles(page: number = 1, pageSize: number = 10) {
+    return await this.roleRepository.list(page, pageSize);
   }
 
   async getRoleByID(id: string) {

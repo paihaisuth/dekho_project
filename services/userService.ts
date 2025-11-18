@@ -3,8 +3,12 @@ import { CustomError } from "@/utils/customError";
 import { IuserRepository } from "@/utils/interface";
 import bcrypt from "bcrypt";
 
-export class UserService implements IuserRepository {
+export class UserService {
   constructor(private userRepository: IuserRepository) {}
+
+  async listUsers(): Promise<Iuser[]> {
+    return this.userRepository.listUsers();
+  }
 
   async getByID(id: string): Promise<Iuser | null> {
     return this.userRepository.getByID(id);

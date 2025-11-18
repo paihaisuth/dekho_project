@@ -1,6 +1,9 @@
 import { Collection } from "mongodb";
 import { mongoClient } from "./mongodb";
 import { Icontract } from "@/schema";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const databaseName = process.env.DATABASE_NAME;
 

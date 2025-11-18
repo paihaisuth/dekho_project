@@ -2,6 +2,9 @@ import { CustomError } from "@/utils/customError";
 import { IauthResponse, IuserRepository } from "@/utils/interface";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export class AuthService {
   constructor(private userRepository: IuserRepository) {}
