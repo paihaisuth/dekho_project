@@ -22,7 +22,7 @@ export class UserService {
     return this.userRepository.getByUsername(username);
   }
 
-  async createUser(user: Iuser & { password: string }): Promise<void> {
+  async createUser(user: Partial<Iuser> & { password: string }): Promise<void> {
     if (!user.username) throw new CustomError("Username is required", 400);
     if (!user.password) throw new CustomError("Password is required", 400);
     if (!user.firstname) throw new CustomError("Firstname is required", 400);
@@ -31,6 +31,12 @@ export class UserService {
     if (!user.roleID) throw new CustomError("Role ID is required", 400);
     if (!user.phoneNumber)
       throw new CustomError("Phone number is required", 400);
+
+    const existUser = await this.userRepository.getByUsername(user.username);
+    if (existUser) throw new CustomError("Username already exists", 400);
+
+    const existEmail = await this.userRepository.getByEmail(user.email);
+    if (existEmail) throw new CustomError("Email already exists", 400);
 
     const passwordHash = bcrypt.hashSync(user.password, 10);
 
