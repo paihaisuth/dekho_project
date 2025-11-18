@@ -22,6 +22,14 @@ export class UserRepository implements IuserRepository {
     return userQuery ? this.mapToEntity(userQuery) : null;
   }
 
+  async getByUsername(username: string): Promise<Iuser | null> {
+    const userQuery = await userConnection.findOne({
+      where: { username: username },
+    });
+
+    return userQuery ? this.mapToEntity(userQuery) : null;
+  }
+
   async createUser(user: Iuser): Promise<void> {
     await userConnection.insertOne(user);
     return;

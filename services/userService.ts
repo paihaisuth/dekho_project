@@ -14,6 +14,10 @@ export class UserService implements IuserRepository {
     return this.userRepository.getByEmail(email);
   }
 
+  async getByUsername(username: string): Promise<Iuser | null> {
+    return this.userRepository.getByUsername(username);
+  }
+
   async createUser(user: Iuser & { password: string }): Promise<void> {
     if (!user.username) throw new CustomError("Username is required", 400);
     if (!user.password) throw new CustomError("Password is required", 400);
