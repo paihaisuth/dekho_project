@@ -53,6 +53,11 @@ export class RoomRepository implements IroomRepository {
     return;
   }
 
+  async deleteByDormitoryID(dormitoryID: string): Promise<void> {
+    await roomConnection.deleteMany({ dormitoryID: dormitoryID });
+    return;
+  }
+
   private mapToIroom(roomData: Iroom & { _id: ObjectId }): Iroom {
     return {
       id: roomData._id.toString(),

@@ -19,18 +19,7 @@ export const getBody = async <T>(request: NextRequest): Promise<T> => {
   }
 };
 
-export function getPagination(
-  req: NextRequest,
-  opts?: {
-    defaultPage?: number;
-    defaultPageSize?: number;
-    maxPageSize?: number;
-  }
-) {
-  const defaultPage = opts?.defaultPage ?? 1;
-  const defaultPageSize = opts?.defaultPageSize ?? 10;
-  const maxPageSize = opts?.maxPageSize ?? 100;
-
+export function getPagination(req: NextRequest) {
   const pageParam =
     req.nextUrl?.searchParams.get("page") ??
     new URL(req.url).searchParams.get("page");
@@ -38,17 +27,22 @@ export function getPagination(
     req.nextUrl?.searchParams.get("pageSize") ??
     new URL(req.url).searchParams.get("pageSize");
 
-  const page = pageParam ? parseInt(pageParam, 10) : defaultPage;
-  const pageSize = pageSizeParam
-    ? parseInt(pageSizeParam, 10)
-    : defaultPageSize;
+  const page = pageParam ? parseInt(pageParam, 10) : 1;
+  const pageSize = pageSizeParam ? parseInt(pageSizeParam, 10) : 10;
 
   if (Number.isNaN(page) || page < 1)
     throw new CustomError("Invalid `page` query parameter", 400);
   if (Number.isNaN(pageSize) || pageSize < 1)
     throw new CustomError("Invalid `pageSize` query parameter", 400);
-  if (pageSize > maxPageSize)
-    throw new CustomError(`pageSize cannot exceed ${maxPageSize}`, 400);
 
   return { page, pageSize };
 }
+
+export const getQueryString = (
+  req: NextRequest,
+  key: string
+): string | null => {
+  return (
+    req.nextUrl?.searchParams.get(key) ?? new URL(req.url).searchParams.get(key)
+  );
+};

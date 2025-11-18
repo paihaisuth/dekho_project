@@ -22,9 +22,14 @@ export interface IuserRepository {
 }
 
 export interface IdormitoryRepository {
-  list(userID: string, filter: { name?: string }): Promise<Idormitory[]>;
+  list(
+    userID: string,
+    filter: { name?: string },
+    page: number,
+    pageSize: number
+  ): Promise<IpaginationFormat<Idormitory>>;
   getByID(id: string): Promise<Idormitory | null>;
-  createDormitory(dormitory: Idormitory): Promise<void>;
+  createDormitory(dormitory: Partial<Idormitory>): Promise<void>;
   updateDormitory(
     id: string,
     dormitoryInfo: Partial<Idormitory>
@@ -38,6 +43,7 @@ export interface IroomRepository {
   createRoom(dormitoryID: string, room: Partial<Iroom>): Promise<void>;
   updateRoom(id: string, roomInfo: Partial<Iroom>): Promise<void>;
   deleteRoom(id: string): Promise<void>;
+  deleteByDormitoryID(dormitoryID: string): Promise<void>;
 }
 
 export interface IbillRepository {
@@ -50,6 +56,7 @@ export interface IbillRepository {
   getByID(id: string): Promise<Ibill | null>;
   createBill(bill: IcreateBill): Promise<void>;
   updateBill(id: string, billInfo: Partial<IupdateBill>): Promise<void>;
+  deleteByDormitoryID(dormitoryID: string): Promise<void>;
 }
 
 export interface IcontractRepository {
@@ -58,6 +65,7 @@ export interface IcontractRepository {
   createContract(contract: Icontract): Promise<void>;
   updateContract(id: string, contractInfo: Partial<Icontract>): Promise<void>;
   deleteContract(id: string): Promise<void>;
+  deleteByDormitoryID(dormitoryID: string): Promise<void>;
 }
 
 export interface IreservationRepository {
@@ -66,6 +74,7 @@ export interface IreservationRepository {
   createReserve(reserveInfo: Partial<Ireservation>): Promise<void>;
   updateReserve(id: string, reserveInfo: Partial<Ireservation>): Promise<void>;
   deleteReserve(id: string): Promise<void>;
+  deleteByDormitoryID(dormitoryID: string): Promise<void>;
 }
 
 export interface IroleRepository {

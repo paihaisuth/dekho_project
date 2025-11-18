@@ -2,7 +2,7 @@ import { Iroom } from "@/schema";
 import { ErepairStatus, EroomStatus } from "@/utils/enum";
 import { IfilterListRoom, IroomRepository } from "@/utils/interface";
 
-export class RoomService implements IroomRepository {
+export class RoomService {
   constructor(private roomRepository: IroomRepository) {}
 
   async list(userID: string, filter: IfilterListRoom) {

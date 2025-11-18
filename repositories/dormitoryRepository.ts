@@ -1,12 +1,17 @@
 import { dormitoryConnection } from "@/lib";
 import { Idormitory } from "@/schema";
-import { IdormitoryRepository } from "@/utils/interface";
+import { IdormitoryRepository, IpaginationFormat } from "@/utils/interface";
 import { ObjectId } from "mongodb";
 
 export class DormitoryRepository implements IdormitoryRepository {
   constructor() {}
 
-  async list(userID: string, filter: { name?: string }): Promise<Idormitory[]> {
+  async list(
+    userID: string,
+    filter: { name?: string },
+    page: number,
+    pageSize: number
+  ): Promise<IpaginationFormat<Idormitory>> {
     const query: {
       userID: string;
       name?: { $regex: string; $options: string };
@@ -16,11 +21,26 @@ export class DormitoryRepository implements IdormitoryRepository {
       query.name = { $regex: filter.name, $options: "i" };
     }
 
-    const dormitoryQuery = await dormitoryConnection.find(query).toArray();
+    const total = await dormitoryConnection.countDocuments(query);
+    const pageCount = Math.ceil(total / pageSize);
 
-    return dormitoryQuery.map((dormitoryData) =>
+    const dormitoryQuery = await dormitoryConnection
+      .find(query)
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .toArray();
+
+    const items = dormitoryQuery.map((dormitoryData) =>
       this.mapToIdormitory(dormitoryData)
     );
+
+    return {
+      page,
+      pageSize,
+      pageCount,
+      total,
+      items,
+    };
   }
 
   async getByID(id: string): Promise<Idormitory | null> {

@@ -37,6 +37,11 @@ export class BillRepository implements IbillRepository {
     return;
   }
 
+  async deleteByDormitoryID(dormitoryID: string): Promise<void> {
+    await billConnection.deleteMany({ dormitoryID: dormitoryID });
+    return;
+  }
+
   private mapToIbill(billData: Ibill & { _id: ObjectId }): Ibill {
     return {
       id: billData._id.toString(),

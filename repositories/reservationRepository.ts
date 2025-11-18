@@ -41,6 +41,11 @@ export class ReservationRepository implements IreservationRepository {
     return;
   }
 
+  async deleteByDormitoryID(dormitoryID: string): Promise<void> {
+    await reservationConnection.deleteMany({ dormitoryID: dormitoryID });
+    return;
+  }
+
   private mapToIreservation(
     reservationData: Ireservation & { _id: ObjectId }
   ): Ireservation {

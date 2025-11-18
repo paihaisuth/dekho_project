@@ -39,6 +39,11 @@ export class ContractRepository {
     return;
   }
 
+  async deleteByDormitoryID(dormitoryID: string): Promise<void> {
+    await contractConnection.deleteMany({ dormitoryID: dormitoryID });
+    return;
+  }
+
   private mapToIcontract(
     contractData: Icontract & { _id: ObjectId }
   ): Icontract {
