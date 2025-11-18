@@ -48,9 +48,9 @@ export class UserRepository implements IuserRepository {
     return;
   }
 
-  private mapToEntity(userQuery: Iuser): Iuser {
+  private mapToEntity(userQuery: Iuser & { _id: ObjectId }): Iuser {
     return {
-      id: userQuery.id.toString(),
+      id: userQuery._id.toString(),
       firstname: userQuery.firstname,
       lastname: userQuery.lastname,
       email: userQuery.email,
