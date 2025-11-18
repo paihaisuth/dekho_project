@@ -78,6 +78,11 @@ export interface IroleRepository {
 
 // -------------------- Other Interfaces --------------------
 
+export interface IresponseMiddleware {
+  id: string;
+  username: string;
+}
+
 export interface Iregister {
   firstname: string;
   lastname: string;

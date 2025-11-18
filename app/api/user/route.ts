@@ -1,4 +1,5 @@
 import { generateAPIResponse } from "@/app/utils/function";
+import { middleware } from "@/middleware";
 import { UserRepository } from "@/repositories/userRepository";
 import { UserService } from "@/services/userService";
 import { CustomError } from "@/utils/customError";
@@ -7,6 +8,8 @@ import { NextRequest } from "next/server";
 export const GET = async (req: NextRequest) => {
   try {
     console.log("========== START GET USER ========== ");
+
+    await middleware(req);
 
     const userRepository = new UserRepository();
     const userService = new UserService(userRepository);

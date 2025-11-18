@@ -1,8 +1,13 @@
 import { generateAPIResponse, getBody } from "@/app/utils/function";
+import { middleware } from "@/middleware";
 import { RoleRepository } from "@/repositories/roleRepository";
 import { RoleService } from "@/services/roleService";
 import { CustomError } from "@/utils/customError";
 import { NextRequest } from "next/server";
+
+interface IbodyUpdateRole {
+  name: string;
+}
 
 export const GET = async (
   req: NextRequest,
@@ -10,6 +15,8 @@ export const GET = async (
 ) => {
   try {
     console.log("========== START GET ROLE BY ID ========== ");
+
+    await middleware(req);
 
     const { id } = await params;
 
@@ -34,16 +41,14 @@ export const GET = async (
   }
 };
 
-interface IbodyUpdateRole {
-  name: string;
-}
-
 export const PUT = async (
   req: NextRequest,
   { params }: { params: { id: string } }
 ) => {
   try {
     console.log("========== START UPDATE ROLE ========== ");
+
+    await middleware(req);
 
     const { id } = await params;
     const roleInfo = await getBody<IbodyUpdateRole>(req);
@@ -74,6 +79,8 @@ export const DELETE = async (
 ) => {
   try {
     console.log("========== START DELETE ROLE ========== ");
+
+    await middleware(req);
 
     const { id } = await params;
 

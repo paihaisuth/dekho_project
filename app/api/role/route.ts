@@ -1,4 +1,5 @@
 import { generateAPIResponse, getBody } from "@/app/utils/function";
+import { middleware } from "@/middleware";
 import { RoleRepository } from "@/repositories/roleRepository";
 import { RoleService } from "@/services/roleService";
 import { CustomError } from "@/utils/customError";
@@ -11,6 +12,8 @@ interface IbodyCreateRole {
 export const POST = async (req: NextRequest) => {
   try {
     console.log("========== START CREATE ROLE ========== ");
+
+    await middleware(req);
 
     const { name } = await getBody<IbodyCreateRole>(req);
 
@@ -38,6 +41,8 @@ export const POST = async (req: NextRequest) => {
 export const GET = async (req: NextRequest) => {
   try {
     console.log("========== START GET ROLE ========== ");
+
+    await middleware(req);
 
     const roleRepository = new RoleRepository();
     const roleService = new RoleService(roleRepository);
