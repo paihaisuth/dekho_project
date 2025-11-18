@@ -1,4 +1,8 @@
-import { generateAPIResponse, getBody } from "@/app/utils/function";
+import {
+  generateAPIResponse,
+  getBody,
+  getPagination,
+} from "@/app/utils/function";
 import { middleware } from "@/middleware";
 import { UserRepository } from "@/repositories/userRepository";
 import { UserService } from "@/services/userService";
@@ -12,10 +16,12 @@ export const GET = async (req: NextRequest) => {
 
     await middleware(req);
 
+    const { page, pageSize } = await getPagination(req);
+
     const userRepository = new UserRepository();
     const userService = new UserService(userRepository);
 
-    const userList = await userService.listUsers();
+    const userList = await userService.listUsers(page, pageSize);
 
     console.log("========== END GET USER ========== ");
     return generateAPIResponse({ items: userList }, 200);

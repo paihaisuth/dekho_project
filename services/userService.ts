@@ -1,14 +1,20 @@
 import { Iuser } from "@/schema";
 import { CustomError } from "@/utils/customError";
-import { IuserRepository } from "@/utils/interface";
+import { IpaginationFormat, IuserRepository } from "@/utils/interface";
 import bcrypt from "bcrypt";
 
 export class UserService {
   constructor(private userRepository: IuserRepository) {}
 
-  async listUsers(): Promise<Omit<Iuser, "passwordHash">[]> {
-    const users = await this.userRepository.listUsers();
-    return users.map((user) => this.removePassword(user));
+  async listUsers(
+    page: number = 1,
+    pageSize: number = 10
+  ): Promise<IpaginationFormat<Omit<Iuser, "passwordHash">>> {
+    const users = await this.userRepository.listUsers(page, pageSize);
+    return {
+      ...users,
+      items: users.items.map((user) => this.removePassword(user)),
+    };
   }
 
   async getByID(id: string): Promise<Omit<Iuser, "passwordHash"> | null> {
@@ -75,6 +81,21 @@ export class UserService {
     }
     userInfo.updatedAt = new Date().toISOString();
 
+    if (userInfo.username) {
+      const existingUser = await this.userRepository.getByUsername(
+        userInfo.username
+      );
+      if (existingUser && existingUser.id !== id) {
+        throw new CustomError("Username already in use by another user", 400);
+      }
+    }
+
+    if (userInfo.email) {
+      const existingUser = await this.userRepository.getByEmail(userInfo.email);
+      if (existingUser && existingUser.id !== id) {
+        throw new CustomError("Email already in use by another user", 400);
+      }
+    }
     await this.userRepository.updateUser(id, userInfo);
     return;
   }

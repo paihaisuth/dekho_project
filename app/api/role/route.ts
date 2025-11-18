@@ -1,4 +1,8 @@
-import { generateAPIResponse, getBody } from "@/app/utils/function";
+import {
+  generateAPIResponse,
+  getBody,
+  getPagination,
+} from "@/app/utils/function";
 import { middleware } from "@/middleware";
 import { RoleRepository } from "@/repositories/roleRepository";
 import { RoleService } from "@/services/roleService";
@@ -44,10 +48,12 @@ export const GET = async (req: NextRequest) => {
 
     await middleware(req);
 
+    const { page, pageSize } = await getPagination(req);
+
     const roleRepository = new RoleRepository();
     const roleService = new RoleService(roleRepository);
 
-    const roleList = await roleService.listRoles();
+    const roleList = await roleService.listRoles(page, pageSize);
 
     console.log("========== END GET ROLE ========== ");
     return generateAPIResponse(roleList, 200);

@@ -1,14 +1,31 @@
 import { userConnection } from "@/lib";
 import { Iuser } from "@/schema";
-import { IuserRepository } from "@/utils/interface";
+import { IpaginationFormat, IuserRepository } from "@/utils/interface";
 import { ObjectId } from "mongodb";
 
 export class UserRepository implements IuserRepository {
   constructor() {}
 
-  async listUsers(): Promise<Iuser[]> {
-    const users = await userConnection.find().toArray();
-    return users.map((user) => this.mapToEntity(user));
+  async listUsers(
+    page: number,
+    pageSize: number
+  ): Promise<IpaginationFormat<Iuser>> {
+    const skip = (page - 1) * pageSize;
+    const total = await userConnection.countDocuments();
+    const pageCount = Math.ceil(total / pageSize);
+
+    const users = await userConnection
+      .find()
+      .skip(skip)
+      .limit(pageSize)
+      .toArray();
+    return {
+      page,
+      pageSize,
+      pageCount,
+      total: total,
+      items: users.map((user) => this.mapToEntity(user)),
+    };
   }
 
   async getByID(id: string): Promise<Iuser | null> {

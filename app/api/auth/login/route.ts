@@ -1,4 +1,5 @@
 import { generateAPIResponse, getBody } from "@/app/utils/function";
+import { RoleRepository } from "@/repositories/roleRepository";
 import { UserRepository } from "@/repositories/userRepository";
 import { AuthService } from "@/services/authService";
 import { CustomError } from "@/utils/customError";
@@ -16,10 +17,12 @@ export const POST = async (req: NextRequest) => {
     const { username, password } = await getBody<IbodyLogin>(req);
 
     const userRepository = new UserRepository();
+    const roleRepository = new RoleRepository();
     const authService = new AuthService(userRepository);
     const { accessToken, refreshToken } = await authService.login(
       username,
-      password
+      password,
+      roleRepository
     );
 
     console.log("========== END LOGIN ========== ");

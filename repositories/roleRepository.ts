@@ -28,7 +28,7 @@ export class RoleRepository implements IroleRepository {
       page,
       pageSize,
       pageCount: Math.ceil(totalRoles / pageSize),
-      totalItems: totalRoles,
+      total: totalRoles,
     };
     return result;
   }
