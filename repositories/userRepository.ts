@@ -12,33 +12,25 @@ export class UserRepository implements IuserRepository {
   }
 
   async getByID(id: string): Promise<Iuser | null> {
-    const userQuery = await userConnection.findOne({
-      where: { _id: new ObjectId(id) },
-    });
+    const userQuery = await userConnection.findOne({ _id: new ObjectId(id) });
 
     return userQuery ? this.mapToEntity(userQuery) : null;
   }
 
   async getByEmail(email: string): Promise<Iuser | null> {
-    const userQuery = await userConnection.findOne({
-      where: { email: email },
-    });
+    const userQuery = await userConnection.findOne({ email: email });
 
     return userQuery ? this.mapToEntity(userQuery) : null;
   }
 
   async getByUsername(username: string): Promise<Iuser | null> {
-    const userQuery = await userConnection.findOne({
-      where: { username: username },
-    });
+    const userQuery = await userConnection.findOne({ username: username });
 
     return userQuery ? this.mapToEntity(userQuery) : null;
   }
 
   async getByRoleID(roleID: string): Promise<Iuser | null> {
-    const userQuery = await userConnection.findOne({
-      where: { roleID: roleID },
-    });
+    const userQuery = await userConnection.findOne({ roleID: roleID });
 
     return userQuery ? this.mapToEntity(userQuery) : null;
   }

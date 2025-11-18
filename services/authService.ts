@@ -1,5 +1,5 @@
 import { CustomError } from "@/utils/customError";
-import { IauthResponse, IuserRepository } from "@/utils/interface";
+import { IauthResponse, Iregister, IuserRepository } from "@/utils/interface";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -8,6 +8,42 @@ dotenv.config();
 
 export class AuthService {
   constructor(private userRepository: IuserRepository) {}
+
+  async register(userInfo: Iregister): Promise<void> {
+    if (!userInfo.roleID) throw new CustomError("Role ID is required", 400);
+    if (!userInfo.firstname)
+      throw new CustomError("First name is required", 400);
+    if (!userInfo.lastname) throw new CustomError("Last name is required", 400);
+    if (!userInfo.phoneNumber)
+      throw new CustomError("Phone number is required", 400);
+    if (!userInfo.email) throw new CustomError("Email is required", 400);
+    if (!userInfo.username) throw new CustomError("Username is required", 400);
+    if (!userInfo.password) throw new CustomError("Password is required", 400);
+
+    const existingUsername = await this.userRepository.getByUsername(
+      userInfo.username
+    );
+    if (existingUsername) throw new CustomError("Username already exists", 400);
+
+    const existingEmail = await this.userRepository.getByEmail(userInfo.email);
+    if (existingEmail) throw new CustomError("Email already exists", 400);
+
+    const passwordHash = bcrypt.hashSync(userInfo.password, 10);
+
+    await this.userRepository.createUser({
+      firstname: userInfo.firstname,
+      lastname: userInfo.lastname,
+      phoneNumber: userInfo.phoneNumber,
+      email: userInfo.email,
+      username: userInfo.username,
+      passwordHash,
+      roleID: userInfo.roleID,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    return;
+  }
+
   async login(username: string, password: string): Promise<IauthResponse> {
     const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
     const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
@@ -74,7 +110,7 @@ export class AuthService {
     )
       throw new CustomError("Invalid token", 401);
 
-    const userQuery = await this.userRepository.getByEmail(decoded.username);
+    const userQuery = await this.userRepository.getByUsername(decoded.username);
     if (!userQuery) throw new CustomError("User not found", 404);
     if (userQuery.passwordHash !== decoded.key)
       throw new CustomError("Password has changed, please login again", 401);

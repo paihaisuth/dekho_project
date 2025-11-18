@@ -13,8 +13,6 @@ export const GET = async (req: NextRequest) => {
 
     const userList = await userService.listUsers();
 
-    console.log("User List: ", userList);
-
     console.log("========== END GET USER ========== ");
     return generateAPIResponse({ items: userList }, 200);
   } catch (error) {

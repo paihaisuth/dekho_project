@@ -16,7 +16,7 @@ export interface IuserRepository {
   getByRoleID(roleID: string): Promise<Iuser | null>;
   getByEmail(email: string): Promise<Iuser | null>;
   getByUsername(username: string): Promise<Iuser | null>;
-  createUser(user: Iuser): Promise<void>;
+  createUser(user: Partial<Iuser>): Promise<void>;
   updateUser(id: string, userInfo: Partial<Iuser>): Promise<void>;
   deleteUser(id: string): Promise<void>;
 }
@@ -77,6 +77,16 @@ export interface IroleRepository {
 }
 
 // -------------------- Other Interfaces --------------------
+
+export interface Iregister {
+  firstname: string;
+  lastname: string;
+  phoneNumber: string;
+  email: string;
+  username: string;
+  password: string;
+  roleID: string;
+}
 
 export interface IpaginationFormat<T> {
   page: number;
