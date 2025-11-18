@@ -6,20 +6,29 @@ import bcrypt from "bcrypt";
 export class UserService {
   constructor(private userRepository: IuserRepository) {}
 
-  async listUsers(): Promise<Iuser[]> {
-    return this.userRepository.listUsers();
+  async listUsers(): Promise<Omit<Iuser, "passwordHash">[]> {
+    const users = await this.userRepository.listUsers();
+    return users.map((user) => this.removePassword(user));
   }
 
-  async getByID(id: string): Promise<Iuser | null> {
-    return this.userRepository.getByID(id);
+  async getByID(id: string): Promise<Omit<Iuser, "passwordHash"> | null> {
+    const user = await this.userRepository.getByID(id);
+    if (!user) return null;
+    return this.removePassword(user);
   }
 
-  async getByEmail(email: string): Promise<Iuser | null> {
-    return this.userRepository.getByEmail(email);
+  async getByEmail(email: string): Promise<Omit<Iuser, "passwordHash"> | null> {
+    const user = await this.userRepository.getByEmail(email);
+    if (!user) return null;
+    return this.removePassword(user);
   }
 
-  async getByUsername(username: string): Promise<Iuser | null> {
-    return this.userRepository.getByUsername(username);
+  async getByUsername(
+    username: string
+  ): Promise<Omit<Iuser, "passwordHash"> | null> {
+    const user = await this.userRepository.getByUsername(username);
+    if (!user) return null;
+    return this.removePassword(user);
   }
 
   async createUser(user: Partial<Iuser> & { password: string }): Promise<void> {
@@ -74,5 +83,10 @@ export class UserService {
   async deleteUser(id: string): Promise<void> {
     await this.userRepository.deleteUser(id);
     return;
+  }
+
+  private removePassword(user: Iuser): Omit<Iuser, "passwordHash"> {
+    const { passwordHash, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 }
