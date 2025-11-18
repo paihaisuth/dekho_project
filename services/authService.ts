@@ -3,6 +3,7 @@ import { IauthResponse, Iregister, IuserRepository } from "@/utils/interface";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { RoleRepository } from "@/repositories/roleRepository";
 
 dotenv.config();
 
@@ -44,7 +45,11 @@ export class AuthService {
     return;
   }
 
-  async login(username: string, password: string): Promise<IauthResponse> {
+  async login(
+    username: string,
+    password: string,
+    roleRepository: RoleRepository
+  ): Promise<IauthResponse> {
     const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
     const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
 
@@ -63,12 +68,16 @@ export class AuthService {
     );
     if (!isPasswordValid) throw new CustomError("Invalid password", 401);
 
+    const role = await roleRepository.getByID(userQuery.roleID);
+    if (!role) throw new CustomError("Role not found", 404);
+
     const customAttributes = {
       firstname: userQuery.firstname,
       lastname: userQuery.lastname,
       username: userQuery.username,
       email: userQuery.email,
       roleID: userQuery.roleID,
+      roleName: role.name,
     };
 
     const accessToken = jwt.sign(
