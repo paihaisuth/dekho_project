@@ -30,6 +30,14 @@ export class UserRepository implements IuserRepository {
     return userQuery ? this.mapToEntity(userQuery) : null;
   }
 
+  async getByRoleID(roleID: string): Promise<Iuser | null> {
+    const userQuery = await userConnection.findOne({
+      where: { roleID: roleID },
+    });
+
+    return userQuery ? this.mapToEntity(userQuery) : null;
+  }
+
   async createUser(user: Iuser): Promise<void> {
     await userConnection.insertOne(user);
     return;

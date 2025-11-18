@@ -3,6 +3,7 @@ import {
   Icontract,
   Idormitory,
   Ireservation,
+  Irole,
   Iroom,
   Iuser,
 } from "@/schema";
@@ -11,6 +12,7 @@ import { EbillStatus, ErepairStatus, EroomStatus, EroomType } from "./enum";
 // -------------------- Repository Interface --------------------
 export interface IuserRepository {
   getByID(id: string): Promise<Iuser | null>;
+  getByRoleID(roleID: string): Promise<Iuser | null>;
   getByEmail(email: string): Promise<Iuser | null>;
   getByUsername(username: string): Promise<Iuser | null>;
   createUser(user: Iuser): Promise<void>;
@@ -63,6 +65,14 @@ export interface IreservationRepository {
   createReserve(reserveInfo: Partial<Ireservation>): Promise<void>;
   updateReserve(id: string, reserveInfo: Partial<Ireservation>): Promise<void>;
   deleteReserve(id: string): Promise<void>;
+}
+
+export interface IroleRepository {
+  list(): Promise<Irole[]>;
+  getByID(id: string): Promise<Irole | null>;
+  createRole(roleInfo: Partial<Irole>): Promise<void>;
+  updateRole(id: string, roleInfo: Partial<Irole>): Promise<void>;
+  deleteRole(id: string): Promise<void>;
 }
 
 // -------------------- Other Interfaces --------------------
