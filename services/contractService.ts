@@ -1,12 +1,7 @@
 import { removeUndefinedKeys } from "@/app/utils/function";
 import { Icontract } from "@/schema";
-import { CustomError } from "@/utils/customError";
 import { EcontractStatus } from "@/utils/enum";
-import {
-  IcontractRepository,
-  IdormitoryRepository,
-  IroomRepository,
-} from "@/utils/interface";
+import { IcontractRepository } from "@/utils/interface";
 
 export class ContractService {
   constructor(private contractRepository: IcontractRepository) {}
