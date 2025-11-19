@@ -1,16 +1,37 @@
 import { reservationConnection } from "@/lib";
 import { Ireservation } from "@/schema";
-import { IreservationRepository } from "@/utils/interface";
+import { IpaginationFormat, IreservationRepository } from "@/utils/interface";
 import { ObjectId } from "mongodb";
 
 export class ReservationRepository implements IreservationRepository {
   constructor() {}
 
-  async list(userID: string): Promise<Ireservation[]> {
-    const reservation = await reservationConnection.find({ userID }).toArray();
-    return reservation.map((reservationData) =>
+  async list(
+    roomID: string,
+    page: number,
+    pageSize: number
+  ): Promise<IpaginationFormat<Ireservation>> {
+    const reservation = await reservationConnection
+      .find({ roomID })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .toArray();
+
+    const total = await reservationConnection.countDocuments({ roomID });
+    const pageCount = Math.ceil(total / pageSize);
+
+    const items = reservation.map((reservationData) =>
       this.mapToIreservation(reservationData)
     );
+
+    return {
+      page,
+      pageSize,
+      pageCount,
+      total,
+      items,
+    };
   }
 
   async getByID(id: string): Promise<Ireservation | null> {

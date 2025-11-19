@@ -75,7 +75,11 @@ export interface IcontractRepository {
 }
 
 export interface IreservationRepository {
-  list(userID: string): Promise<Ireservation[]>;
+  list(
+    roomID: string,
+    page: number,
+    pageSize: number
+  ): Promise<IpaginationFormat<Ireservation>>;
   getByID(id: string): Promise<Ireservation | null>;
   createReserve(reserveInfo: Partial<Ireservation>): Promise<void>;
   updateReserve(id: string, reserveInfo: Partial<Ireservation>): Promise<void>;
