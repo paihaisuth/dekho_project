@@ -1,3 +1,4 @@
+import { removeUndefinedKeys } from "@/app/utils/function";
 import { Ibill } from "@/schema";
 import { CustomError } from "@/utils/customError";
 import { EbillStatus } from "@/utils/enum";
@@ -5,6 +6,7 @@ import {
   IbillRepository,
   IcontractRepository,
   IcreateBill,
+  IpaginationFormat,
   IresponseBill,
   IroomRepository,
 } from "@/utils/interface";
@@ -16,17 +18,19 @@ export class BillService {
     roomID: string,
     contractID: string,
     contractRepository: IcontractRepository,
-    roomRepository: IroomRepository
-  ): Promise<IresponseBill[]> {
+    roomRepository: IroomRepository,
+    page: number = 1,
+    pageSize: number = 10
+  ): Promise<IpaginationFormat<IresponseBill>> {
     const bills = await this.billRepository.list(
       roomID,
       contractID,
-      contractRepository,
-      roomRepository
+      page,
+      pageSize
     );
 
     const responseBills: IresponseBill[] = [];
-    for (const bill of bills) {
+    for (const bill of bills.items) {
       const room = await roomRepository.getByID(bill.roomID);
       const contract = await contractRepository.getByID(bill.contractID);
 
@@ -34,6 +38,7 @@ export class BillService {
       if (!contract) throw new CustomError("Contract not found", 404);
 
       responseBills.push({
+        id: bill.id,
         billingDate: bill.billingDate,
         electricityPrice: bill.electricityPrice,
         waterPrice: bill.waterPrice,
@@ -48,7 +53,13 @@ export class BillService {
         lastname: contract.lastname,
       });
     }
-    return responseBills;
+    return {
+      items: responseBills,
+      total: bills.total,
+      page: bills.page,
+      pageSize: bills.pageSize,
+      pageCount: bills.pageCount,
+    };
   }
 
   async getByID(
@@ -67,6 +78,7 @@ export class BillService {
     if (!contract) throw new CustomError("Contract not found", 404);
 
     return {
+      id: bill.id,
       billingDate: bill.billingDate,
       electricityPrice: bill.electricityPrice,
       waterPrice: bill.waterPrice,
@@ -106,6 +118,28 @@ export class BillService {
 
   async updateBill(id: string, billInfo: Partial<Ibill>) {
     billInfo.updatedAt = new Date().toISOString();
-    return await this.billRepository.updateBill(id, billInfo);
+
+    // Validate status is a valid enum value
+    if (
+      billInfo.status &&
+      !Object.values(EbillStatus).includes(billInfo.status)
+    )
+      throw new CustomError("Invalid bill status", 400);
+
+    const bill = await this.billRepository.getByID(id);
+    if (!bill) throw new CustomError("Bill not found", 404);
+
+    if (billInfo.rentalPrice)
+      billInfo.total =
+        billInfo.rentalPrice +
+        (bill.waterPrice || 0) +
+        (bill.electricityPrice || 0);
+
+    const toUpdate = removeUndefinedKeys<Partial<Ibill>>(billInfo);
+    return await this.billRepository.updateBill(id, toUpdate);
+  }
+
+  async deleteBill(id: string) {
+    return await this.billRepository.deleteBill(id);
   }
 }

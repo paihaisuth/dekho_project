@@ -7,42 +7,49 @@ import {
 import { middleware } from "@/middleware";
 import { BillRepository } from "@/repositories/billRepository";
 import { ContractRepository } from "@/repositories/contractRepository";
-import { DormitoryRepository } from "@/repositories/dormitoryRepository";
 import { RoomRepository } from "@/repositories/roomRepository";
-import { ContractService } from "@/services/contractService";
+import { BillService } from "@/services/billService";
 import { CustomError } from "@/utils/customError";
 import { NextRequest } from "next/server";
 
-interface IbodyCreateContract {
+interface IbodyCreateBill {
   roomID: string;
-  idCard: string;
-  firstname: string;
-  lastname: string;
-  startDate: string;
-  endDate: string;
-  securityPrice: number;
-  securityPriceDate: string;
+  contractID: string;
+  billingDate: string;
+  rentalPrice: number;
 }
 
 export const GET = async (req: NextRequest) => {
   try {
-    console.log("========== START LIST CONTRACT ==========");
+    console.log("========== START LIST BILL ========== ");
+
     await middleware(req);
 
-    const roomID = await getQueryString(req, "roomID");
+    const roomID = getQueryString(req, "roomID");
     if (!roomID) throw new CustomError("Room ID is required", 400);
+    const contractID = getQueryString(req, "contractID");
+    if (!contractID) throw new CustomError("Contract ID is required", 400);
 
     const { page, pageSize } = await getPagination(req);
 
     const contractRepository = new ContractRepository();
-    const contractService = new ContractService(contractRepository);
+    const roomRepository = new RoomRepository();
+    const billRepository = new BillRepository();
+    const billService = new BillService(billRepository);
 
-    const contracts = await contractService.list(roomID, page, pageSize);
+    const bills = await billService.list(
+      roomID,
+      contractID,
+      contractRepository,
+      roomRepository,
+      page,
+      pageSize
+    );
 
-    console.log("========== END LIST CONTRACT ==========");
-    return generateAPIResponse(contracts, 200);
+    console.log("========== END LIST BILL ========== ");
+    return generateAPIResponse(bills, 200);
   } catch (error) {
-    console.log("========== ERROR LIST CONTRACT ==========", error);
+    console.log("========== ERROR LIST BILL ========== ", error);
     if (error instanceof CustomError)
       return generateAPIResponse({ message: error.message }, error.status);
     return generateAPIResponse(
@@ -57,27 +64,21 @@ export const GET = async (req: NextRequest) => {
 
 export const POST = async (req: NextRequest) => {
   try {
-    console.log("========== START CREATE CONTRACT ==========");
+    console.log("========== START CREATE BILL ========== ");
+
     await middleware(req);
 
-    const contractInfo = await getBody<IbodyCreateContract>(req);
+    const billData = await getBody<IbodyCreateBill>(req);
 
     const billRepository = new BillRepository();
-    const roomRepository = new RoomRepository();
-    const dormitoryRepository = new DormitoryRepository();
-    const contractRepository = new ContractRepository();
-    const contractService = new ContractService(contractRepository);
+    const billService = new BillService(billRepository);
 
-    await contractService.createContract(
-      contractInfo,
-      billRepository,
-      dormitoryRepository,
-      roomRepository
-    );
-    console.log("========== END CREATE CONTRACT ==========");
-    return generateAPIResponse({ message: "Create contract success" }, 201);
+    await billService.createBill(billData);
+
+    console.log("========== END CREATE BILL ========== ");
+    return generateAPIResponse({ message: "Bill created successfully" }, 201);
   } catch (error) {
-    console.log("========== ERROR CREATE CONTRACT ==========", error);
+    console.log("========== ERROR CREATE BILL ========== ", error);
     if (error instanceof CustomError)
       return generateAPIResponse({ message: error.message }, error.status);
     return generateAPIResponse(

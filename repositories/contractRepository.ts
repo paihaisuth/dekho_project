@@ -39,9 +39,15 @@ export class ContractRepository {
     return contractQuery ? this.mapToIcontract(contractQuery) : null;
   }
 
-  async createContract(contract: Icontract): Promise<void> {
-    await contractConnection.insertOne(contract);
-    return;
+  async createContract(contract: Icontract): Promise<Icontract> {
+    const result = await contractConnection.insertOne(contract);
+    const insertedContract = await contractConnection.findOne({
+      _id: result.insertedId,
+    });
+    if (!insertedContract) {
+      throw new Error("Failed to create contract");
+    }
+    return this.mapToIcontract(insertedContract);
   }
 
   async updateContract(
@@ -78,7 +84,7 @@ export class ContractRepository {
       securityPrice: contractData.securityPrice,
       securityPriceDate: contractData.securityPriceDate,
       totoalPrice: contractData.totoalPrice,
-      updagtedAt: contractData.updagtedAt,
+      updatedAt: contractData.updatedAt,
       endDate: contractData.endDate,
       roomID: contractData.roomID,
       startDate: contractData.startDate,

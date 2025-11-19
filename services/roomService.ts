@@ -63,7 +63,8 @@ export class RoomService {
         .toString()
         .padStart(roomInfo.charLength, "0")}`;
       const existingRoom = await this.roomRepository.getByName(roomName);
-      if (existingRoom) existingRoomList.push(roomName);
+      if (existingRoom && existingRoom.dormitoryID === dormitoryID)
+        existingRoomList.push(roomName);
     }
 
     // If any rooms exist, throw an error

@@ -1,7 +1,12 @@
 import { removeUndefinedKeys } from "@/app/utils/function";
-import { Icontract } from "@/schema";
-import { EcontractStatus } from "@/utils/enum";
-import { IcontractRepository } from "@/utils/interface";
+import { Ibill, Icontract } from "@/schema";
+import { EbillStatus, EcontractStatus } from "@/utils/enum";
+import {
+  IbillRepository,
+  IcontractRepository,
+  IdormitoryRepository,
+  IroomRepository,
+} from "@/utils/interface";
 
 export class ContractService {
   constructor(private contractRepository: IcontractRepository) {}
@@ -14,7 +19,12 @@ export class ContractService {
     return await this.contractRepository.getByID(id);
   }
 
-  async createContract(contractInfo: Partial<Icontract>) {
+  async createContract(
+    contractInfo: Partial<Icontract>,
+    billRepository: IbillRepository,
+    dormitoryRepository: IdormitoryRepository,
+    roomRepository: IroomRepository
+  ) {
     if (!contractInfo.roomID) throw new Error("Room ID is required");
     if (!contractInfo.firstname) throw new Error("First name is required");
     if (!contractInfo.lastname) throw new Error("Last name is required");
@@ -26,19 +36,57 @@ export class ContractService {
     if (!contractInfo.securityPriceDate)
       throw new Error("Security price date is required");
 
+    // Count month between startDate and endDate withnot this month
+    const start = new Date(contractInfo.startDate);
+    const end = new Date(contractInfo.endDate);
+    const months =
+      (end.getFullYear() - start.getFullYear()) * 12 +
+      (end.getMonth() - start.getMonth());
+
+    if (months < 1) throw new Error("Contract must be at least 1 month long");
+
     const newContract: Partial<Icontract> = {
       ...contractInfo,
       status: EcontractStatus.ACTIVE,
       createdAt: new Date().toISOString(),
-      updagtedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
-    await this.contractRepository.createContract(newContract as Icontract);
 
+    const contract = await this.contractRepository.createContract(
+      newContract as Icontract
+    );
+
+    const roomQuery = await roomRepository.getByID(contractInfo.roomID);
+    console.log(
+      "🚀 ~ ContractService ~ createContract ~ roomQuery:",
+      roomQuery
+    );
+    if (!roomQuery) throw new Error("Room not found for the given room ID");
+
+    const dormitory = await dormitoryRepository.getByID(roomQuery.dormitoryID);
+    if (!dormitory)
+      throw new Error("Dormitory not found for the given room ID");
+
+    // Create bills for each month
+    for (let i = 0; i < months; i++) {
+      const newBill: Partial<Ibill> = {
+        contractID: contract.id,
+        roomID: contractInfo.roomID,
+        billingDate: dormitory.billingDate,
+        rentalPrice: roomQuery.rentalPrice,
+        status: EbillStatus.NONE,
+        total: roomQuery.rentalPrice,
+        payPrice: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      await billRepository.createBill(newBill);
+    }
     return;
   }
 
   async updateContract(id: string, contractInfo: Partial<Icontract>) {
-    contractInfo.updagtedAt = new Date().toISOString();
+    contractInfo.updatedAt = new Date().toISOString();
     const toUpdate = removeUndefinedKeys(contractInfo);
     return await this.contractRepository.updateContract(id, toUpdate);
   }

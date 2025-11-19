@@ -56,12 +56,13 @@ export interface IbillRepository {
   list(
     roomID: string,
     contractID: string,
-    contractRepository: IcontractRepository,
-    roomRepository: IroomRepository
-  ): Promise<Ibill[]>;
+    page: number,
+    pageSize: number
+  ): Promise<IpaginationFormat<Ibill>>;
   getByID(id: string): Promise<Ibill | null>;
-  createBill(bill: IcreateBill): Promise<void>;
+  createBill(bill: Partial<Ibill>): Promise<void>;
   updateBill(id: string, billInfo: Partial<IupdateBill>): Promise<void>;
+  deleteBill(id: string): Promise<void>;
   deleteByDormitoryID(dormitoryID: string): Promise<void>;
 }
 
@@ -72,7 +73,7 @@ export interface IcontractRepository {
     pageSize: number
   ): Promise<IpaginationFormat<Icontract>>;
   getByID(id: string): Promise<Icontract | null>;
-  createContract(contract: Icontract): Promise<void>;
+  createContract(contract: Icontract): Promise<Icontract>;
   updateContract(id: string, contractInfo: Partial<Icontract>): Promise<void>;
   deleteContract(id: string): Promise<void>;
   deleteByDormitoryID(dormitoryID: string): Promise<void>;
@@ -137,6 +138,7 @@ export interface IfilterListRoom {
 }
 
 export interface IresponseBill {
+  id: string;
   firstname: string;
   lastname: string;
   status: EbillStatus;

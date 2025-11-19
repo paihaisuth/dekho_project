@@ -1,15 +1,36 @@
 import { billConnection } from "@/lib";
 import { Ibill } from "@/schema";
-import { IbillRepository } from "@/utils/interface";
+import { IbillRepository, IpaginationFormat } from "@/utils/interface";
 import { ObjectId } from "mongodb";
 
 export class BillRepository implements IbillRepository {
   constructor() {}
 
-  async list(roomID: string, contractID: string): Promise<Ibill[]> {
-    const billQuery = billConnection.find({ roomID, contractID });
-    const bills = await billQuery.toArray();
-    return bills.map((billData) => this.mapToIbill(billData));
+  async list(
+    roomID: string,
+    contractID: string,
+    page: number,
+    pageSize: number
+  ): Promise<IpaginationFormat<Ibill>> {
+    const total = await billConnection.countDocuments({ roomID, contractID });
+    const pageCount = Math.ceil(total / pageSize);
+
+    const billQuery = await billConnection
+      .find({ roomID, contractID })
+      .sort({ _id: -1 })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .toArray();
+
+    const items = billQuery.map((billData) => this.mapToIbill(billData));
+
+    return {
+      items,
+      total,
+      page,
+      pageSize,
+      pageCount,
+    };
   }
 
   async getByID(id: string): Promise<Ibill | null> {

@@ -14,7 +14,7 @@ interface Icontract {
   contractURL: string;
   idCardURL: string;
   createdAt: string;
-  updagtedAt: string;
+  updatedAt: string;
   roomID: string;
 }
 
