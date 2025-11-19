@@ -1,11 +1,18 @@
+import { removeUndefinedKeys } from "@/app/utils/function";
 import { Icontract } from "@/schema";
-import { IcontractRepository } from "@/utils/interface";
+import { CustomError } from "@/utils/customError";
+import { EcontractStatus } from "@/utils/enum";
+import {
+  IcontractRepository,
+  IdormitoryRepository,
+  IroomRepository,
+} from "@/utils/interface";
 
 export class ContractService {
   constructor(private contractRepository: IcontractRepository) {}
 
-  async list(roomID: string) {
-    return await this.contractRepository.list(roomID);
+  async list(roomID: string, page: number = 1, pageSize: number = 10) {
+    return await this.contractRepository.list(roomID, page, pageSize);
   }
 
   async getByID(id: string) {
@@ -19,20 +26,26 @@ export class ContractService {
     if (!contractInfo.idCard) throw new Error("ID Card is required");
     if (!contractInfo.startDate) throw new Error("Start date is required");
     if (!contractInfo.endDate) throw new Error("End date is required");
+    if (typeof contractInfo.securityPrice !== "number")
+      throw new Error("Security price must be a number");
+    if (!contractInfo.securityPriceDate)
+      throw new Error("Security price date is required");
 
     const newContract: Partial<Icontract> = {
       ...contractInfo,
+      status: EcontractStatus.ACTIVE,
       createdAt: new Date().toISOString(),
       updagtedAt: new Date().toISOString(),
     };
-    return await this.contractRepository.createContract(
-      newContract as Icontract
-    );
+    await this.contractRepository.createContract(newContract as Icontract);
+
+    return;
   }
 
   async updateContract(id: string, contractInfo: Partial<Icontract>) {
     contractInfo.updagtedAt = new Date().toISOString();
-    return await this.contractRepository.updateContract(id, contractInfo);
+    const toUpdate = removeUndefinedKeys(contractInfo);
+    return await this.contractRepository.updateContract(id, toUpdate);
   }
 
   async deleteContract(id: string) {

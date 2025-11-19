@@ -1,14 +1,35 @@
 import { contractConnection } from "@/lib";
 import { Icontract } from "@/schema";
+import { IpaginationFormat } from "@/utils/interface";
 import { ObjectId } from "mongodb";
 
 export class ContractRepository {
   constructor() {}
 
-  async list(dormitoryID: string): Promise<Icontract[]> {
-    const contractQuery = contractConnection.find({ dormitoryID });
-    const contracts = await contractQuery.toArray();
-    return contracts.map((contractData) => this.mapToIcontract(contractData));
+  async list(
+    roomID: string,
+    page: number,
+    pageSize: number
+  ): Promise<IpaginationFormat<Icontract>> {
+    const contractQuery = await contractConnection
+      .find({ roomID })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .toArray();
+    const total = await contractConnection.countDocuments({ roomID });
+    const pageCount = Math.ceil(total / pageSize);
+    const items = contractQuery.map((contractData) =>
+      this.mapToIcontract(contractData)
+    );
+
+    return {
+      page,
+      pageSize,
+      pageCount,
+      total,
+      items,
+    };
   }
 
   async getByID(id: string): Promise<Icontract | null> {
@@ -49,7 +70,6 @@ export class ContractRepository {
   ): Icontract {
     return {
       id: contractData._id.toString(),
-      billCollectionDate: contractData.billCollectionDate,
       contractURL: contractData.contractURL,
       createdAt: contractData.createdAt,
       firstname: contractData.firstname,

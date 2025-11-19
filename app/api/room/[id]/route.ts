@@ -51,17 +51,7 @@ export const PUT = async (
 
     const { id } = await params;
 
-    const toUpdate = await getBody<
-      Omit<
-        Iroom,
-        | "id"
-        | "dormitoryID"
-        | "images"
-        | "refundURL"
-        | "createdAt"
-        | "updatedAt"
-      >
-    >(req);
+    const toUpdate = await getBody<Partial<Iroom>>(req);
 
     const roomRepository = new RoomRepository();
     const roomService = new RoomService(roomRepository);

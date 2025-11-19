@@ -79,6 +79,8 @@ export class DormitoryRepository implements IdormitoryRepository {
       name: dormitoryData.name,
       address: dormitoryData.address,
       roomCount: dormitoryData.roomCount,
+      billingDate: dormitoryData.billingDate,
+      checkDate: dormitoryData.checkDate,
       createdAt: dormitoryData.createdAt,
       updatedAt: dormitoryData.updatedAt,
       userID: dormitoryData.userID,

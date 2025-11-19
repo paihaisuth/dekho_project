@@ -10,7 +10,6 @@ interface Icontract {
   endDate: string;
   securityPriceDate: string;
   securityPrice: number;
-  billCollectionDate: string;
   totoalPrice: number;
   contractURL: string;
   idCardURL: string;

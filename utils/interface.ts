@@ -66,7 +66,11 @@ export interface IbillRepository {
 }
 
 export interface IcontractRepository {
-  list(userID: string): Promise<Icontract[]>;
+  list(
+    roomID: string,
+    page: number,
+    pageSize: number
+  ): Promise<IpaginationFormat<Icontract>>;
   getByID(id: string): Promise<Icontract | null>;
   createContract(contract: Icontract): Promise<void>;
   updateContract(id: string, contractInfo: Partial<Icontract>): Promise<void>;

@@ -1,19 +1,10 @@
 import { generateAPIResponse, getBody } from "@/app/utils/function";
 import { middleware } from "@/middleware";
 import { ReservationRepository } from "@/repositories/reservationRepository";
+import { Ireservation } from "@/schema";
 import { ReservationService } from "@/services/reservationService";
 import { CustomError } from "@/utils/customError";
 import { NextRequest } from "next/server";
-
-interface IbodyUpdateReservation {
-  idCard: string;
-  firstname: string;
-  lastname: string;
-  reservePriceDate: string;
-  reservePrice: number;
-  securityPriceDate: string;
-  securityPrice: number;
-}
 
 export const GET = async (
   req: NextRequest,
@@ -57,7 +48,7 @@ export const PUT = async (
 
     await middleware(req);
     const { id } = await params;
-    const body = await getBody<IbodyUpdateReservation>(req);
+    const body = await getBody<Partial<Ireservation>>(req);
 
     if (!id) throw new CustomError("Reservation ID is required", 400);
 

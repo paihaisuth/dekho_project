@@ -16,6 +16,8 @@ interface IbodyCreateDormitory {
   address: string;
   userID: string;
   roomCount: number;
+  billingDate: string;
+  checkDate: string;
 }
 
 export const GET = async (req: NextRequest) => {
@@ -69,6 +71,8 @@ export const POST = async (req: NextRequest) => {
       address,
       userID,
       roomCount = 0,
+      billingDate,
+      checkDate,
     } = await getBody<IbodyCreateDormitory>(req);
 
     const userRepository = new UserRepository();
@@ -81,6 +85,8 @@ export const POST = async (req: NextRequest) => {
         address,
         userID,
         roomCount,
+        billingDate,
+        checkDate,
       },
       userRepository
     );
