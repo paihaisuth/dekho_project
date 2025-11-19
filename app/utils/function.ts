@@ -46,3 +46,11 @@ export const getQueryString = (
     req.nextUrl?.searchParams.get(key) ?? new URL(req.url).searchParams.get(key)
   );
 };
+
+export const removeUndefinedKeys = <T extends Record<string, unknown>>(
+  obj: T
+): Partial<T> => {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([_, value]) => value !== undefined)
+  ) as Partial<T>;
+};

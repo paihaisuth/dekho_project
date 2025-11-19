@@ -38,8 +38,14 @@ export interface IdormitoryRepository {
 }
 
 export interface IroomRepository {
-  list(userID: string, filter: IfilterListRoom): Promise<Iroom[]>;
+  list(
+    dormitoryID: string,
+    filter: IfilterListRoom,
+    page: number,
+    pageSize: number
+  ): Promise<IpaginationFormat<Iroom>>;
   getByID(id: string): Promise<Iroom | null>;
+  getByName(name: string): Promise<Iroom | null>;
   createRoom(dormitoryID: string, room: Partial<Iroom>): Promise<void>;
   updateRoom(id: string, roomInfo: Partial<Iroom>): Promise<void>;
   deleteRoom(id: string): Promise<void>;

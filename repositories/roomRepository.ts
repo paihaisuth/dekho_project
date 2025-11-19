@@ -1,13 +1,22 @@
 import { roomConnection } from "@/lib";
 import { Iroom } from "@/schema";
-import { IfilterListRoom, IroomRepository } from "@/utils/interface";
+import {
+  IfilterListRoom,
+  IpaginationFormat,
+  IroomRepository,
+} from "@/utils/interface";
 import { Filter, ObjectId } from "mongodb";
 
 export class RoomRepository implements IroomRepository {
   constructor() {}
 
-  async list(userID: string, filter: IfilterListRoom): Promise<Iroom[]> {
-    const query: Filter<Iroom> = { userID: userID };
+  async list(
+    dormitoryID: string,
+    filter: IfilterListRoom,
+    page: number,
+    pageSize: number
+  ): Promise<IpaginationFormat<Iroom>> {
+    const query: Filter<Iroom> = { dormitoryID: dormitoryID };
 
     if (filter.name) {
       query.name = { $regex: filter.name, $options: "i" };
@@ -25,13 +34,34 @@ export class RoomRepository implements IroomRepository {
       query.status = filter.status;
     }
 
-    const roomQuery = await roomConnection.find(query).toArray();
+    const roomQuery = await roomConnection
+      .find(query)
+      .sort({ _id: -1 })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .toArray();
 
-    return roomQuery.map((roomData) => this.mapToIroom(roomData));
+    const total = await roomConnection.countDocuments(query);
+    const pageCount = Math.ceil(total / pageSize);
+
+    const items = roomQuery.map((roomData) => this.mapToIroom(roomData));
+
+    return {
+      page,
+      pageSize,
+      pageCount,
+      total,
+      items,
+    };
   }
 
   async getByID(id: string): Promise<Iroom | null> {
     const roomQuery = await roomConnection.findOne({ _id: new ObjectId(id) });
+    return roomQuery ? this.mapToIroom(roomQuery) : null;
+  }
+
+  async getByName(name: string): Promise<Iroom | null> {
+    const roomQuery = await roomConnection.findOne({ name: name });
     return roomQuery ? this.mapToIroom(roomQuery) : null;
   }
 
