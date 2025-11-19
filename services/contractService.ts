@@ -57,10 +57,6 @@ export class ContractService {
     );
 
     const roomQuery = await roomRepository.getByID(contractInfo.roomID);
-    console.log(
-      "🚀 ~ ContractService ~ createContract ~ roomQuery:",
-      roomQuery
-    );
     if (!roomQuery) throw new Error("Room not found for the given room ID");
 
     const dormitory = await dormitoryRepository.getByID(roomQuery.dormitoryID);
