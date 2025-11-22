@@ -10,7 +10,7 @@ import { NextRequest } from "next/server";
 
 export const GET = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
     console.log("========== START GET BILL BY ID ========== ");
@@ -48,7 +48,7 @@ export const GET = async (
 
 export const PUT = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
     console.log("========== START UPDATE BILL ========== ");
@@ -81,7 +81,7 @@ export const PUT = async (
 
 export const DELETE = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
     console.log("========== START DELETE BILL ========== ");
