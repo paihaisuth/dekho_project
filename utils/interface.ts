@@ -10,6 +10,12 @@ import {
 import { EbillStatus, ErepairStatus, EroomStatus, EroomType } from "./enum";
 
 // -------------------- Repository Interface --------------------
+
+export interface IfileRepository {
+  uploadFile(file: File, prefix?: string): Promise<IresponseUploadFile>;
+  deleteFile(key: string): Promise<void>;
+}
+
 export interface IuserRepository {
   listUsers(page: number, pageSize: number): Promise<IpaginationFormat<Iuser>>;
   getByID(id: string): Promise<Iuser | null>;
@@ -169,4 +175,9 @@ export interface IupdateBill {
   payDate: string;
   payPrice: number;
   slipURL: string;
+}
+
+export interface IresponseUploadFile {
+  url: string;
+  key: string;
 }
