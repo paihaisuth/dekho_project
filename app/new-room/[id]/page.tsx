@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import Input from "../../components/Input";
 import Dropdown from "../../components/Dropdown";
 import Button from "../../components/Button";
@@ -32,7 +32,15 @@ interface FormState {
   dormitoryID?: string;
 }
 
-export default function NewRoomPage() {
+export default function Main() {
+  return (
+    <Suspense>
+      <NewRoomPage />
+    </Suspense>
+  );
+}
+
+function NewRoomPage() {
   const searchParams = useSearchParams();
   const params = useParams();
   const routeDormitoryID =
