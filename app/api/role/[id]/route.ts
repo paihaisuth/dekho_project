@@ -11,7 +11,7 @@ interface IbodyUpdateRole {
 
 export const GET = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
     console.log("========== START GET ROLE BY ID ========== ");
@@ -43,7 +43,7 @@ export const GET = async (
 
 export const PUT = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
     console.log("========== START UPDATE ROLE ========== ");
@@ -75,7 +75,7 @@ export const PUT = async (
 
 export const DELETE = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
     console.log("========== START DELETE ROLE ========== ");
