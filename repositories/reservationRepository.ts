@@ -1,37 +1,17 @@
+import { removeUndefinedKeys } from "@/app/utils/function";
 import { reservationConnection } from "@/lib";
 import { Ireservation } from "@/schema";
-import { IpaginationFormat, IreservationRepository } from "@/utils/interface";
+import { IreservationRepository } from "@/utils/interface";
 import { ObjectId } from "mongodb";
 
 export class ReservationRepository implements IreservationRepository {
   constructor() {}
 
-  async list(
-    roomID: string,
-    page: number,
-    pageSize: number
-  ): Promise<IpaginationFormat<Ireservation>> {
-    const reservation = await reservationConnection
-      .find({ roomID })
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * pageSize)
-      .limit(pageSize)
-      .toArray();
-
-    const total = await reservationConnection.countDocuments({ roomID });
-    const pageCount = Math.ceil(total / pageSize);
-
-    const items = reservation.map((reservationData) =>
-      this.mapToIreservation(reservationData)
-    );
-
-    return {
-      page,
-      pageSize,
-      pageCount,
-      total,
-      items,
-    };
+  async getByRoomID(roomID: string): Promise<Ireservation | null> {
+    const reservationQuery = await reservationConnection.findOne({
+      roomID: roomID,
+    });
+    return reservationQuery ? this.mapToIreservation(reservationQuery) : null;
   }
 
   async getByID(id: string): Promise<Ireservation | null> {
@@ -42,6 +22,12 @@ export class ReservationRepository implements IreservationRepository {
   }
 
   async createReserve(reserveInfo: Ireservation): Promise<void> {
+    const existingReserve = await this.getByRoomID(reserveInfo.roomID);
+    if (existingReserve) {
+      const toUpdate = removeUndefinedKeys<Partial<Ireservation>>(reserveInfo);
+      await this.updateReserve(existingReserve.id as string, toUpdate);
+      return;
+    }
     await reservationConnection.insertOne(reserveInfo);
     return;
   }
@@ -64,6 +50,11 @@ export class ReservationRepository implements IreservationRepository {
 
   async deleteByDormitoryID(dormitoryID: string): Promise<void> {
     await reservationConnection.deleteMany({ dormitoryID: dormitoryID });
+    return;
+  }
+
+  async deleteByRoomID(roomID: string): Promise<void> {
+    await reservationConnection.deleteMany({ roomID: roomID });
     return;
   }
 

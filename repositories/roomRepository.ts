@@ -42,7 +42,7 @@ export class RoomRepository implements IroomRepository {
       .toArray();
 
     const total = await roomConnection.countDocuments(query);
-    const pageCount = Math.ceil(total / pageSize);
+    const pageCount = Math.max(Math.ceil(total / pageSize), 1);
 
     const items = roomQuery.map((roomData) => this.mapToIroom(roomData));
 

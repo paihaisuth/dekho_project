@@ -46,8 +46,6 @@ export const GET = async (req: NextRequest) => {
   try {
     console.log("========== START GET ROLE ========== ");
 
-    await middleware(req);
-
     const { page, pageSize } = await getPagination(req);
 
     const roleRepository = new RoleRepository();

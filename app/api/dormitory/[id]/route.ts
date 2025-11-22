@@ -12,6 +12,8 @@ import { NextRequest } from "next/server";
 interface IbodyUpdateDormitory {
   name?: string;
   address?: string;
+  billingDate?: string;
+  checkDate?: string;
 }
 
 export const GET = async (
@@ -55,13 +57,18 @@ export const PUT = async (
     await middleware(req);
 
     const { id } = await params;
-    const { address, name } = await getBody<IbodyUpdateDormitory>(req);
+    const { address, name, billingDate, checkDate } =
+      await getBody<IbodyUpdateDormitory>(req);
 
     const dormitoryRepository = new DormitoryRepository();
     const dormitoryService = new DormitoryService(dormitoryRepository);
 
-    await dormitoryService.updateDormitory(id, { address, name });
-
+    await dormitoryService.updateDormitory(id, {
+      address,
+      name,
+      billingDate,
+      checkDate,
+    });
     console.log("========== END UPDATE DORMITORY ========== ");
     return generateAPIResponse(
       { message: "Dormitory updated successfully" },

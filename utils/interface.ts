@@ -35,6 +35,7 @@ export interface IdormitoryRepository {
     dormitoryInfo: Partial<Idormitory>
   ): Promise<void>;
   deleteDormitory(id: string): Promise<void>;
+  addRoomCount(id: string, count: number): Promise<void>;
 }
 
 export interface IroomRepository {
@@ -55,23 +56,25 @@ export interface IroomRepository {
 export interface IbillRepository {
   list(
     roomID: string,
-    contractID: string,
     page: number,
-    pageSize: number
+    pageSize: number,
+    filter: { status?: EbillStatus }
   ): Promise<IpaginationFormat<Ibill>>;
   getByID(id: string): Promise<Ibill | null>;
   createBill(bill: Partial<Ibill>): Promise<void>;
   updateBill(id: string, billInfo: Partial<IupdateBill>): Promise<void>;
   deleteBill(id: string): Promise<void>;
   deleteByDormitoryID(dormitoryID: string): Promise<void>;
+  deleteByContractID(contractID: string): Promise<void>;
 }
 
 export interface IcontractRepository {
-  list(
-    roomID: string,
-    page: number,
-    pageSize: number
-  ): Promise<IpaginationFormat<Icontract>>;
+  // list(
+  //   roomID: string,
+  //   page: number,
+  //   pageSize: number
+  // ): Promise<IpaginationFormat<Icontract>>;
+  getByRoomID(roomID: string): Promise<Icontract | null>;
   getByID(id: string): Promise<Icontract | null>;
   createContract(contract: Icontract): Promise<Icontract>;
   updateContract(id: string, contractInfo: Partial<Icontract>): Promise<void>;
@@ -80,15 +83,12 @@ export interface IcontractRepository {
 }
 
 export interface IreservationRepository {
-  list(
-    roomID: string,
-    page: number,
-    pageSize: number
-  ): Promise<IpaginationFormat<Ireservation>>;
   getByID(id: string): Promise<Ireservation | null>;
+  getByRoomID(id: string): Promise<Ireservation | null>;
   createReserve(reserveInfo: Partial<Ireservation>): Promise<void>;
   updateReserve(id: string, reserveInfo: Partial<Ireservation>): Promise<void>;
   deleteReserve(id: string): Promise<void>;
+  deleteByRoomID(roomID: string): Promise<void>;
   deleteByDormitoryID(dormitoryID: string): Promise<void>;
 }
 
@@ -147,6 +147,7 @@ export interface IresponseBill {
   electricityPrice: number;
   rentalPrice: number;
   total: number;
+  payDate: string;
   payPrice: number;
   slipURL: string;
   createdAt: string;

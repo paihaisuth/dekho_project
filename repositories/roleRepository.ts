@@ -12,7 +12,7 @@ export class RoleRepository implements IroleRepository {
     pageSize: number
   ): Promise<IpaginationFormat<Irole>> {
     const skip = (page - 1) * pageSize;
-    const totalRoles = await roleConnection.countDocuments();
+    const total = await roleConnection.countDocuments();
 
     const roles = await roleConnection
       .find()
@@ -23,12 +23,13 @@ export class RoleRepository implements IroleRepository {
 
     const mapedRoles = roles.map((role) => this.matpToRole(role));
 
+    const pageCount = Math.max(Math.ceil(total / pageSize), 1);
     const result = {
       items: mapedRoles,
       page,
       pageSize,
-      pageCount: Math.ceil(totalRoles / pageSize),
-      total: totalRoles,
+      pageCount,
+      total,
     };
     return result;
   }

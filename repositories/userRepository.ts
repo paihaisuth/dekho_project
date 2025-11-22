@@ -12,7 +12,7 @@ export class UserRepository implements IuserRepository {
   ): Promise<IpaginationFormat<Iuser>> {
     const skip = (page - 1) * pageSize;
     const total = await userConnection.countDocuments();
-    const pageCount = Math.ceil(total / pageSize);
+    const pageCount = Math.max(Math.ceil(total / pageSize), 1);
 
     const users = await userConnection
       .find()

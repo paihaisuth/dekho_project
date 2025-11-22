@@ -1,6 +1,8 @@
 import { generateAPIResponse, getBody } from "@/app/utils/function";
 import { middleware } from "@/middleware";
+import { BillRepository } from "@/repositories/billRepository";
 import { ContractRepository } from "@/repositories/contractRepository";
+import { RoomRepository } from "@/repositories/roomRepository";
 import { Icontract } from "@/schema";
 import { ContractService } from "@/services/contractService";
 import { CustomError } from "@/utils/customError";
@@ -19,10 +21,11 @@ export const GET = async (
     const contractRepository = new ContractRepository();
     const contractService = new ContractService(contractRepository);
 
-    const contract = await contractService.getByID(id);
+    const contract = await contractService.getByRoomID(id);
 
+    const result = { ...contract };
     console.log("========== END GET CONTRACT BY ID ==========");
-    return generateAPIResponse(contract, 200);
+    return generateAPIResponse(result, 200);
   } catch (error) {
     console.log("========== ERROR GET CONTRACT BY ID ==========", error);
     if (error instanceof CustomError)
@@ -83,11 +86,12 @@ export const DELETE = async (
     const { id } = await params;
     if (!id) throw new CustomError("Contract ID is required", 400);
 
+    const roomRepository = new RoomRepository();
+    const billRepository = new BillRepository();
     const contractRepository = new ContractRepository();
     const contractService = new ContractService(contractRepository);
 
-    await contractService.deleteContract(id);
-
+    await contractService.deleteContract(id, roomRepository, billRepository);
     console.log("========== END DELETE CONTRACT ==========");
     return generateAPIResponse(
       { message: "Contract deleted successfully" },

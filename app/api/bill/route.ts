@@ -27,8 +27,8 @@ export const GET = async (req: NextRequest) => {
 
     const roomID = getQueryString(req, "roomID");
     if (!roomID) throw new CustomError("Room ID is required", 400);
-    const contractID = getQueryString(req, "contractID");
-    if (!contractID) throw new CustomError("Contract ID is required", 400);
+    const filter = await getQueryString(req, "filter");
+    const parsedFilter = JSON.parse(filter || "{}");
 
     const { page, pageSize } = await getPagination(req);
 
@@ -39,11 +39,11 @@ export const GET = async (req: NextRequest) => {
 
     const bills = await billService.list(
       roomID,
-      contractID,
       contractRepository,
       roomRepository,
       page,
-      pageSize
+      pageSize,
+      parsedFilter
     );
 
     console.log("========== END LIST BILL ========== ");

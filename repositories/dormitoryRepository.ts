@@ -22,10 +22,11 @@ export class DormitoryRepository implements IdormitoryRepository {
     }
 
     const total = await dormitoryConnection.countDocuments(query);
-    const pageCount = Math.ceil(total / pageSize);
+    const pageCount = Math.max(Math.ceil(total / pageSize), 1);
 
     const dormitoryQuery = await dormitoryConnection
       .find(query)
+      .sort({ _id: -1 })
       .skip((page - 1) * pageSize)
       .limit(pageSize)
       .toArray();
@@ -68,6 +69,14 @@ export class DormitoryRepository implements IdormitoryRepository {
 
   async deleteDormitory(id: string): Promise<void> {
     await dormitoryConnection.deleteOne({ _id: new ObjectId(id) });
+    return;
+  }
+
+  async addRoomCount(id: string, count: number): Promise<void> {
+    await dormitoryConnection.updateOne(
+      { _id: new ObjectId(id) },
+      { $inc: { roomCount: count } }
+    );
     return;
   }
 

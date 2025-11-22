@@ -1,7 +1,12 @@
 import { removeUndefinedKeys } from "@/app/utils/function";
 import { Iroom } from "@/schema";
+import { CustomError } from "@/utils/customError";
 import { ErepairStatus, EroomStatus, EroomType } from "@/utils/enum";
-import { IfilterListRoom, IroomRepository } from "@/utils/interface";
+import {
+  IdormitoryRepository,
+  IfilterListRoom,
+  IroomRepository,
+} from "@/utils/interface";
 
 export class RoomService {
   constructor(private roomRepository: IroomRepository) {}
@@ -28,43 +33,59 @@ export class RoomService {
       to: number;
       prefix: string;
       charLength: number;
-    }
+    },
+    dormitoryRepository: IdormitoryRepository
   ) {
     if (!roomInfo.name) throw new Error("Room name is required");
     if (!roomInfo.type) throw new Error("Room type is required");
 
     // Set default values for from and to
     if (roomInfo.from === undefined) roomInfo.from = 1;
-    if (roomInfo.to === undefined) roomInfo.to = 5;
+    if (roomInfo.to === undefined) roomInfo.to = 1;
 
+    const roomCount = roomInfo.to - roomInfo.from + 1;
     const existingRoomList = [];
 
     // Validate max length
-    if (roomInfo.from + roomInfo.to > 20)
-      throw new Error("Cannot create more than 20 rooms at once");
+    if (roomCount > 20)
+      throw new CustomError("Cannot create more than 20 rooms at once", 400);
 
     // Validate from is >= 1 and to is >= from
     if (roomInfo.from < 1)
-      throw new Error("Room from must be greater than or equal to 1");
+      throw new CustomError(
+        "Room from must be greater than or equal to 1",
+        400
+      );
     if (roomInfo.to < roomInfo.from)
-      throw new Error("Room to must be greater than or equal to room from");
+      throw new CustomError(
+        "Room to must be greater than or equal to room from",
+        400
+      );
 
     // Validagte charLenght is positive and not less than length of length of to
     if (roomInfo.charLength < 1)
-      throw new Error("Character length must be positive");
+      throw new CustomError("Character length must be positive", 400);
     if (roomInfo.charLength < roomInfo.to.toString().length)
-      throw new Error(
-        "Character length must be greater than or equal to length of room to"
+      throw new CustomError(
+        "Character length must be greater than or equal to length of room to",
+        400
       );
 
-    // Check for existing rooms
-    for (let i = roomInfo.from; i <= roomInfo.to; i++) {
-      const roomName = `${roomInfo.prefix}${i
-        .toString()
-        .padStart(roomInfo.charLength, "0")}`;
-      const existingRoom = await this.roomRepository.getByName(roomName);
+    if (roomInfo.name && roomCount === 1) {
+      const existingRoom = await this.roomRepository.getByName(roomInfo.name);
       if (existingRoom && existingRoom.dormitoryID === dormitoryID)
-        existingRoomList.push(roomName);
+        throw new CustomError("Room name already exists", 400);
+    }
+
+    // Check for existing rooms
+    for (let i = 0; i < roomCount; i++) {
+      const roomName = roomInfo.name
+        ? roomInfo.name
+        : `${roomInfo.prefix}${(i + roomInfo.from)
+            .toString()
+            .padStart(roomInfo.charLength, "0")}`;
+      const existingRoom = await this.roomRepository.getByName(roomName);
+      if (existingRoom) existingRoomList.push(roomName);
     }
 
     // If any rooms exist, throw an error
@@ -72,10 +93,12 @@ export class RoomService {
       throw new Error(`Rooms already exist: ${existingRoomList.join(", ")}`);
 
     // Create rooms
-    for (let i = roomInfo.from; i <= roomInfo.to; i++) {
-      const roomName = `${roomInfo.prefix}${i
-        .toString()
-        .padStart(roomInfo.charLength, "0")}`;
+    for (let i = 0; i < roomCount; i++) {
+      const roomName = roomInfo.name
+        ? roomInfo.name
+        : `${roomInfo.prefix}${(i + roomInfo.from)
+            .toString()
+            .padStart(roomInfo.charLength, "0")}`;
       const newRoom: Partial<Iroom> = {
         name: roomName,
         type: roomInfo.type,
@@ -86,6 +109,8 @@ export class RoomService {
       };
       await this.roomRepository.createRoom(dormitoryID, newRoom);
     }
+
+    await dormitoryRepository.addRoomCount(dormitoryID, roomCount);
 
     return;
   }
@@ -105,7 +130,11 @@ export class RoomService {
     return await this.roomRepository.updateRoom(id, updatedRoomInfo);
   }
 
-  async deleteRoom(id: string) {
+  async deleteRoom(id: string, dormitoryRepository: IdormitoryRepository) {
+    const room = await this.roomRepository.getByID(id);
+    if (!room) throw new Error("Room not found");
+
+    await dormitoryRepository.addRoomCount(room.dormitoryID, -1);
     return await this.roomRepository.deleteRoom(id);
   }
 }

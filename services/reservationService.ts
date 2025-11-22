@@ -1,19 +1,19 @@
 import { removeUndefinedKeys } from "@/app/utils/function";
 import { Ireservation } from "@/schema";
-import { IreservationRepository } from "@/utils/interface";
+import { EroomStatus } from "@/utils/enum";
+import { IreservationRepository, IroomRepository } from "@/utils/interface";
 
 export class ReservationService {
   constructor(private reservationRepository: IreservationRepository) {}
 
-  async list(roomID: string, page: number = 1, pageSize: number = 10) {
-    return await this.reservationRepository.list(roomID, page, pageSize);
+  async getByRoomID(roomID: string) {
+    return await this.reservationRepository.getByRoomID(roomID);
   }
 
-  async getByID(id: string) {
-    return await this.reservationRepository.getByID(id);
-  }
-
-  async createReserve(reserveInfo: Partial<Ireservation>) {
+  async createReserve(
+    reserveInfo: Partial<Ireservation>,
+    roomRepository: IroomRepository
+  ) {
     if (!reserveInfo.roomID) throw new Error("Room ID is required");
     if (!reserveInfo.firstname) throw new Error("First name is required");
     if (!reserveInfo.lastname) throw new Error("Last name is required");
@@ -23,6 +23,14 @@ export class ReservationService {
     if (typeof reserveInfo.securityPrice !== "number")
       throw new Error("Security price is required");
 
+    if (reserveInfo.roomID) {
+      const existRoom = await roomRepository.getByID(reserveInfo.roomID);
+      // If room status is occupied, throw error
+      if (existRoom?.status === EroomStatus.LIVED_IN) {
+        throw new Error("Room is already occupied");
+      }
+    }
+
     const newReserve: Partial<Ireservation> = {
       ...reserveInfo,
       totalPrice: reserveInfo.reservePrice + reserveInfo.securityPrice,
@@ -30,9 +38,13 @@ export class ReservationService {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    return await this.reservationRepository.createReserve(
-      newReserve as Ireservation
-    );
+    await this.reservationRepository.createReserve(newReserve as Ireservation);
+
+    await roomRepository.updateRoom(reserveInfo.roomID, {
+      status: EroomStatus.BOOKED,
+    });
+
+    return;
   }
 
   async updateReserve(id: string, reserveInfo: Partial<Ireservation>) {
@@ -44,7 +56,14 @@ export class ReservationService {
     return await this.reservationRepository.updateReserve(id, toUpdate);
   }
 
-  async deleteReserve(id: string) {
-    return await this.reservationRepository.deleteReserve(id);
+  async deleteReserve(id: string, roomRepository: IroomRepository) {
+    const existingReserve = await this.reservationRepository.getByID(id);
+    if (!existingReserve) throw new Error("Reservation not found");
+
+    await roomRepository.updateRoom(existingReserve.roomID, {
+      status: EroomStatus.AVAILABLE,
+    });
+    await this.reservationRepository.deleteReserve(id);
+    return;
   }
 }

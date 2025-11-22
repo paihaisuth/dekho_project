@@ -1,6 +1,7 @@
 import { generateAPIResponse, getBody } from "@/app/utils/function";
 import { middleware } from "@/middleware";
 import { ReservationRepository } from "@/repositories/reservationRepository";
+import { RoomRepository } from "@/repositories/roomRepository";
 import { Ireservation } from "@/schema";
 import { ReservationService } from "@/services/reservationService";
 import { CustomError } from "@/utils/customError";
@@ -11,7 +12,7 @@ export const GET = async (
   { params }: { params: { id: string } }
 ) => {
   try {
-    console.log("========== START GET RESERVATION BY ID ==========");
+    console.log("========== START GET RESERVATION BY ROOM ID ==========");
 
     await middleware(req);
     const { id } = await params;
@@ -20,13 +21,17 @@ export const GET = async (
 
     const reservationRepository = new ReservationRepository();
     const reservationService = new ReservationService(reservationRepository);
-    const reservation = await reservationService.getByID(id);
-    if (!reservation) throw new CustomError("Reservation not found", 404);
+    const reservation = await reservationService.getByRoomID(id);
 
-    console.log("========== END GET RESERVATION BY ID ==========");
-    return generateAPIResponse(reservation, 200);
+    const result = { ...reservation };
+
+    console.log("========== END GET RESERVATION BY ROOM ID ==========");
+    return generateAPIResponse(result, 200);
   } catch (error) {
-    console.log("========== ERROR GET RESERVATION BY ID ==========", error);
+    console.log(
+      "========== ERROR GET RESERVATION BY ROOM ID ==========",
+      error
+    );
     if (error instanceof CustomError)
       return generateAPIResponse({ message: error.message }, error.status);
     return generateAPIResponse(
@@ -85,11 +90,11 @@ export const DELETE = async (
 
     if (!id) throw new CustomError("Reservation ID is required", 400);
 
+    const roomRepository = new RoomRepository();
     const reservationRepository = new ReservationRepository();
     const reservationService = new ReservationService(reservationRepository);
 
-    await reservationService.deleteReserve(id);
-
+    await reservationService.deleteReserve(id, roomRepository);
     console.log("========== END DELETE RESERVATION ==========");
     return generateAPIResponse({ message: "Reservation deleted" }, 200);
   } catch (error) {

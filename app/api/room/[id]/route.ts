@@ -1,5 +1,6 @@
 import { generateAPIResponse, getBody } from "@/app/utils/function";
 import { middleware } from "@/middleware";
+import { DormitoryRepository } from "@/repositories/dormitoryRepository";
 import { RoomRepository } from "@/repositories/roomRepository";
 import { Iroom } from "@/schema";
 import { RoomService } from "@/services/roomService";
@@ -86,11 +87,11 @@ export const DELETE = async (
     const { id } = await params;
     if (!id) throw new CustomError("Room ID is required", 400);
 
+    const dormitoryRepository = new DormitoryRepository();
     const roomRepository = new RoomRepository();
     const roomService = new RoomService(roomRepository);
 
-    await roomService.deleteRoom(id);
-
+    await roomService.deleteRoom(id, dormitoryRepository);
     console.log("========== END DELETE ROOM BY ID ==========");
     return generateAPIResponse({ message: "Room deleted successfully" }, 200);
   } catch (error) {

@@ -72,6 +72,7 @@ export class AuthService {
     if (!role) throw new CustomError("Role not found", 404);
 
     const customAttributes = {
+      userID: userQuery.id,
       firstname: userQuery.firstname,
       lastname: userQuery.lastname,
       username: userQuery.username,

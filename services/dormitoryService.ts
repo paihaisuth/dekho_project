@@ -51,6 +51,10 @@ export class DormitoryService {
     return this.dormitoryRepository.updateDormitory(id, {
       ...(dormitoryInfo.name && { name: dormitoryInfo.name }),
       ...(dormitoryInfo.address && { address: dormitoryInfo.address }),
+      ...(dormitoryInfo.billingDate && {
+        billingDate: dormitoryInfo.billingDate,
+      }),
+      ...(dormitoryInfo.checkDate && { checkDate: dormitoryInfo.checkDate }),
       updatedAt: dormitoryInfo.updatedAt,
     });
   }

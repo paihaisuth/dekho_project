@@ -16,17 +16,17 @@ export class BillService {
 
   async list(
     roomID: string,
-    contractID: string,
     contractRepository: IcontractRepository,
     roomRepository: IroomRepository,
     page: number = 1,
-    pageSize: number = 10
+    pageSize: number = 10,
+    filter: { status?: EbillStatus } = {}
   ): Promise<IpaginationFormat<IresponseBill>> {
     const bills = await this.billRepository.list(
       roomID,
-      contractID,
       page,
-      pageSize
+      pageSize,
+      filter
     );
 
     const responseBills: IresponseBill[] = [];
@@ -46,6 +46,7 @@ export class BillService {
         status: bill.status,
         total: bill.total,
         payPrice: bill.payPrice,
+        payDate: bill.payDate,
         slipURL: bill.slipURL,
         createdAt: bill.createdAt,
         updatedAt: bill.updatedAt,
@@ -89,6 +90,7 @@ export class BillService {
       slipURL: bill.slipURL,
       createdAt: bill.createdAt,
       updatedAt: bill.updatedAt,
+      payDate: bill.payDate,
       firstname: contract.firstname,
       lastname: contract.lastname,
     };

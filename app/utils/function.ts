@@ -1,3 +1,4 @@
+import { AxiosError, AxiosResponse } from "axios";
 import { CustomError } from "@/utils/customError";
 import { NextRequest } from "next/server";
 
@@ -53,4 +54,24 @@ export const removeUndefinedKeys = <T extends Record<string, unknown>>(
   return Object.fromEntries(
     Object.entries(obj).filter(([_, value]) => value !== undefined)
   ) as Partial<T>;
+};
+
+export const getError = <T>(
+  error: unknown
+): { statusCode: number; errorMessage: string; data: T } => {
+  if (error instanceof AxiosError) {
+    const statusCode = error.response?.status || 400;
+    const errorMessage = error.response?.data.message || "Unknow error";
+
+    return { statusCode, errorMessage, data: error.response?.data };
+  }
+  return { statusCode: 400, errorMessage: "Unkown error", data: {} as T };
+};
+
+export const getResponse = <T>(
+  response: AxiosResponse
+): { statusCode: number; data: T; errorMessage: string } => {
+  const statusCode = response.status;
+  const data = response.data;
+  return { statusCode, data, errorMessage: "" };
 };

@@ -1,5 +1,6 @@
 import { billConnection } from "@/lib";
 import { Ibill } from "@/schema";
+import { EbillStatus } from "@/utils/enum";
 import { IbillRepository, IpaginationFormat } from "@/utils/interface";
 import { ObjectId } from "mongodb";
 
@@ -8,16 +9,19 @@ export class BillRepository implements IbillRepository {
 
   async list(
     roomID: string,
-    contractID: string,
     page: number,
-    pageSize: number
+    pageSize: number,
+    filter: { status?: EbillStatus }
   ): Promise<IpaginationFormat<Ibill>> {
-    const total = await billConnection.countDocuments({ roomID, contractID });
-    const pageCount = Math.ceil(total / pageSize);
+    const total = await billConnection.countDocuments({
+      roomID,
+      ...(filter.status ? { status: filter.status } : {}),
+    });
 
+    const pageCount = Math.max(Math.ceil(total / pageSize), 1);
     const billQuery = await billConnection
-      .find({ roomID, contractID })
-      .sort({ _id: -1 })
+      .find({ roomID, ...(filter.status ? { status: filter.status } : {}) })
+      .sort({ _id: 1 })
       .skip((page - 1) * pageSize)
       .limit(pageSize)
       .toArray();
@@ -60,6 +64,11 @@ export class BillRepository implements IbillRepository {
 
   async deleteByDormitoryID(dormitoryID: string): Promise<void> {
     await billConnection.deleteMany({ dormitoryID: dormitoryID });
+    return;
+  }
+
+  async deleteByContractID(contractID: string): Promise<void> {
+    await billConnection.deleteMany({ contractID: contractID });
     return;
   }
 
