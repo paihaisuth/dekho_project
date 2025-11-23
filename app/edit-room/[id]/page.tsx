@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useRouter, useParams } from "next/navigation";
 import roomQuery from "../../axios/roomQuery";
 import { Iroom } from "@/schema";
@@ -9,7 +9,16 @@ import Loading from "../../components/Loading";
 import Input from "../../components/Input";
 import Dropdown from "../../components/Dropdown";
 import Button from "../../components/Button";
+import Toggle from "../../components/Toggle";
 import { EroomType, EroomStatus } from "@/utils/enum";
+
+const EditRoomPageWrapper = () => {
+  return (
+    <Suspense fallback={<Loading overlay text="Loading..." />}>
+      <EditRoomPage />
+    </Suspense>
+  );
+};
 
 const EditRoomPage = () => {
   const params = useParams();
@@ -24,10 +33,13 @@ const EditRoomPage = () => {
     type: EroomType.AIR,
     status: EroomStatus.AVAILABLE,
     securityPrice: 0,
-    waterPerUnit: 0,
+    waterPrice: 0,
+    isFlatPriceWater: false,
     electricityPerUnit: 0,
     rentalPrice: 0,
   });
+  const [isFlatPriceWater, setIsFlatPriceWater] = useState(false);
+  const [waterPrice, setWaterPrice] = useState("");
 
   useEffect(() => {
     if (!id) return;
@@ -37,6 +49,8 @@ const EditRoomPage = () => {
         const res = await roomQuery.get(id);
         if (res.statusCode === 200 && res.data) {
           setForm(res.data as Partial<Iroom>);
+          setIsFlatPriceWater(res.data.isFlatPriceWater);
+          setWaterPrice(String(res.data.waterPrice));
         } else {
           toast.error(res.errorMessage || "Failed to load room");
         }
@@ -84,7 +98,8 @@ const EditRoomPage = () => {
         type: form.type as EroomType,
         status: form.status as EroomStatus,
         securityPrice: Number(form.securityPrice || 0),
-        waterPerUnit: Number(form.waterPerUnit || 0),
+        waterPrice: Number(waterPrice),
+        isFlatPriceWater: Boolean(isFlatPriceWater),
         electricityPerUnit: Number(form.electricityPerUnit || 0),
         rentalPrice: Number(form.rentalPrice ?? 0),
       };
@@ -103,6 +118,22 @@ const EditRoomPage = () => {
     }
   };
 
+  const handleToggleChange = (value: boolean) => {
+    setIsFlatPriceWater(value);
+    if (value) {
+      setWaterPrice(""); // Reset water price when toggling
+    }
+    // Call API to update room when toggle changes
+    if (id) {
+      const payload: Partial<Iroom> = {
+        ...form,
+        waterPrice: value ? Number(waterPrice) : 0,
+        isFlatPriceWater: value,
+      };
+      roomQuery.update(id, payload);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-6 dark:bg-zinc-900">
       <Toaster position="top-center" />
@@ -110,53 +141,57 @@ const EditRoomPage = () => {
         <Loading overlay text={saving ? "Saving..." : "Loading room..."} />
       )}
 
-      <div className="w-full max-w-2xl bg-white dark:bg-zinc-800 rounded-2xl shadow p-6">
-        <h1 className="text-2xl font-semibold mb-4">Edit Room</h1>
+      <div className="w-full max-w-3xl bg-white dark:bg-zinc-800 rounded-2xl shadow p-8">
+        <h1 className="text-3xl font-bold mb-6 text-center">Edit Room</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label="Name"
-            value={form.name as string}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleChange("name", e.target.value)
-            }
-            required
-          />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-2 gap-6">
+            <Input
+              label="Name"
+              value={form.name as string}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleChange("name", e.target.value)
+              }
+              required
+            />
 
-          <Input
-            label="Description"
-            value={form.description as string}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleChange("description", e.target.value)
-            }
-          />
+            <Input
+              label="Description"
+              value={form.description as string}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleChange("description", e.target.value)
+              }
+            />
+          </div>
 
-          <Dropdown
-            label="Type"
-            options={[
-              { value: "AIR", label: "AIR" },
-              { value: "FAN", label: "FAN" },
-            ]}
-            value={String(form.type)}
-            onChange={(e: { target: { value: string } }) =>
-              handleChange("type", e.target.value as EroomType)
-            }
-          />
+          <div className="grid grid-cols-2 gap-6">
+            <Dropdown
+              label="Type"
+              options={[
+                { value: "AIR", label: "AIR" },
+                { value: "FAN", label: "FAN" },
+              ]}
+              value={String(form.type)}
+              onChange={(e: { target: { value: string } }) =>
+                handleChange("type", e.target.value as EroomType)
+              }
+            />
 
-          <Dropdown
-            label="Status"
-            options={[
-              { value: "AVAILABLE", label: "Available" },
-              { value: "BOOKED", label: "Booked" },
-              { value: "LIVED_IN", label: "Occupied" },
-            ]}
-            value={String(form.status)}
-            onChange={(e: { target: { value: string } }) =>
-              handleChange("status", e.target.value as EroomStatus)
-            }
-          />
+            <Dropdown
+              label="Status"
+              options={[
+                { value: "AVAILABLE", label: "Available" },
+                { value: "BOOKED", label: "Booked" },
+                { value: "LIVED_IN", label: "Occupied" },
+              ]}
+              value={String(form.status)}
+              onChange={(e: { target: { value: string } }) =>
+                handleChange("status", e.target.value as EroomStatus)
+              }
+            />
+          </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-6">
             <Input
               label="Security Price"
               type="number"
@@ -164,18 +199,56 @@ const EditRoomPage = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 handleChange("securityPrice", Number(e.target.value))
               }
+              className="w-full"
             />
-            <Input
-              label="Water Per Unit"
-              type="number"
-              value={String(form.waterPerUnit ?? "")}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleChange("waterPerUnit", Number(e.target.value))
-              }
-            />
+
+            <div className="flex gap-4">
+              <div className="w-full flex flex-col sm:flex-row gap-4 items-stretch">
+                <div className="flex-1">
+                  <Input
+                    label="Water Price"
+                    type="number"
+                    value={waterPrice}
+                    onChange={async (
+                      e: React.ChangeEvent<HTMLInputElement>
+                    ) => {
+                      setWaterPrice(e.target.value);
+                      if (id) {
+                        const payload: Partial<Iroom> = {
+                          ...form,
+                          waterPrice: Number(e.target.value),
+                          isFlatPriceWater,
+                        };
+                        await roomQuery.update(id, payload);
+                      }
+                    }}
+                  />
+                </div>
+                <div className="flex items-end">
+                  <div className="flex flex-col justify-end sm:justify-center">
+                    <Toggle
+                      className="h-12"
+                      options={[
+                        {
+                          value: "flatPrice",
+                          label: "Flat Price",
+                        },
+                        {
+                          value: "perUnit",
+                          label: "Per Unit",
+                        },
+                      ]}
+                      onChange={() => handleToggleChange(!isFlatPriceWater)}
+                      value={isFlatPriceWater ? "flatPrice" : "perUnit"}
+                      size="md"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-6">
             <Input
               label="Electricity Per Unit"
               type="number"
@@ -184,6 +257,7 @@ const EditRoomPage = () => {
                 handleChange("electricityPerUnit", Number(e.target.value))
               }
             />
+
             <Input
               label="Rental Price"
               type="number"
@@ -194,37 +268,13 @@ const EditRoomPage = () => {
             />
           </div>
 
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex justify-end gap-4">
             <Button type="button" variant="ghost" onClick={() => router.back()}>
               Back
             </Button>
-
-            <div className="flex items-center gap-3">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={async () => {
-                  // reset to fetched values by reloading
-                  if (id) {
-                    setLoading(true);
-                    try {
-                      const res = await roomQuery.get(id);
-                      if (res.statusCode === 200 && res.data)
-                        setForm(res.data as Partial<Iroom>);
-                    } catch {
-                      /* ignore */
-                    } finally {
-                      setLoading(false);
-                    }
-                  }
-                }}
-              >
-                Reset
-              </Button>
-              <Button type="submit" loading={saving}>
-                Save
-              </Button>
-            </div>
+            <Button type="submit" loading={saving} variant="primary">
+              Save
+            </Button>
           </div>
         </form>
       </div>
@@ -232,4 +282,4 @@ const EditRoomPage = () => {
   );
 };
 
-export default EditRoomPage;
+export default EditRoomPageWrapper;
