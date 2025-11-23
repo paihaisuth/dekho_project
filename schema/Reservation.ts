@@ -10,6 +10,7 @@ interface Ireservation {
   securityPriceDate: string;
   securityPrice: number;
   totalPrice: number;
+  slipURL: string;
   createdAt: string;
   updatedAt: string;
   roomID: string;

@@ -69,6 +69,7 @@ export class ReservationRepository implements IreservationRepository {
       lastname: reservationData.lastname,
       idCard: reservationData.idCard,
       paidDate: reservationData.paidDate,
+      slipURL: reservationData.slipURL,
       status: reservationData.status,
       reservePrice: reservationData.reservePrice,
       reservePriceDate: reservationData.reservePriceDate,
