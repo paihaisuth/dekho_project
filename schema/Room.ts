@@ -9,7 +9,8 @@ interface Iroom {
   status: EroomStatus;
   repairStatus: ErepairStatus;
   securityPrice: number;
-  waterPerUnit: number;
+  waterPrice: number;
+  isFlatPriceWater: boolean;
   electricityPerUnit: number;
   rentalPrice: number;
   refundPrice: number;
