@@ -71,6 +71,9 @@ export class ContractService {
       throw new CustomError("Contract must be at least 1 month long", 400);
 
     const newContract: Partial<Icontract> = {
+      ...removeUndefinedKeys(contractInfo),
+      status: EcontractStatus.ACTIVE,
+      createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 

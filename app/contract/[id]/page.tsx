@@ -1,15 +1,18 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Input from "../../components/Input";
 import DateInput from "../../components/DateInput";
 import Button from "../../components/Button";
+import Image from "next/image";
 import Loading from "../../components/Loading";
+import { FiUpload } from "react-icons/fi";
 import toast, { Toaster } from "react-hot-toast";
 import axiosInstance from "../../axios/instance";
 import { getError, getResponse } from "../../utils/function";
 import contractQuery from "@/app/axios/contractQuery";
+import fileQuery from "@/app/axios/fileQuery";
 
 const ContractPage = () => {
   const params = useParams();
@@ -28,7 +31,63 @@ const ContractPage = () => {
     endDate: "",
     securityPriceDate: "",
     securityPrice: 0,
+    idCardURL: "",
+    contractURL: "",
   });
+
+  const idCardInputRef = useRef<HTMLInputElement | null>(null);
+  const contractInputRef = useRef<HTMLInputElement | null>(null);
+
+  const uploadIDCard = async (file: File) => {
+    const { data, errorMessage } = await fileQuery.upload(
+      file,
+      `contract/${roomID}`
+    );
+
+    if (errorMessage) {
+      toast.error(`Failed to upload ID Card file`);
+      return;
+    }
+
+    const { errorMessage: errorMessageUpdateContract } =
+      await contractQuery.update(form.id, {
+        idCardURL: data?.url || "",
+      });
+
+    if (errorMessageUpdateContract) {
+      toast.error(`Failed to update contract with ID Card URL`);
+      return;
+    }
+
+    toast.success("ID Card uploaded successfully");
+    return;
+  };
+
+  const uploadContractDoc = async (file: File) => {
+    const { data, errorMessage } = await fileQuery.upload(
+      file,
+      `contract/${roomID}`
+    );
+
+    if (errorMessage) {
+      toast.error(`Failed to upload Contract Doc file`);
+      return;
+    }
+
+    const { errorMessage: errorMessageUpdateContract } =
+      await contractQuery.update(form.id, {
+        contractURL: data?.url || "",
+      });
+
+    if (errorMessageUpdateContract) {
+      toast.error(`Failed to update contract with Contract Doc URL`);
+      return;
+    }
+
+    toast.success("Contract Doc uploaded successfully");
+
+    return;
+  };
 
   const fetchContract = useCallback(async () => {
     if (!roomID) {
@@ -57,6 +116,8 @@ const ContractPage = () => {
             ? new Date(data.securityPriceDate).toISOString().split("T")[0]
             : "",
           securityPrice: data.securityPrice || 0,
+          idCardURL: data.idCardURL || "",
+          contractURL: data.contractURL || "",
         });
       } else {
         toast.error(errorMessage || "Failed to load contract");
@@ -184,7 +245,7 @@ const ContractPage = () => {
             placeholder="Enter ID card number"
           />
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="First Name"
               value={form.firstname}
@@ -201,7 +262,7 @@ const ContractPage = () => {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <DateInput
               label="Start Date"
               value={form.startDate}
@@ -216,7 +277,7 @@ const ContractPage = () => {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <DateInput
               label="Security Price Date"
               value={form.securityPriceDate}
@@ -233,6 +294,92 @@ const ContractPage = () => {
               required
               placeholder="0.00"
             />
+          </div>
+
+          {/* ID Card section (top) */}
+          <div className="mb-4">
+            <input
+              ref={idCardInputRef}
+              type="file"
+              accept="image/*,application/pdf"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                await uploadIDCard(file);
+              }}
+            />
+
+            <div className="flex flex-col items-start gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="md"
+                onClick={() => idCardInputRef.current?.click()}
+                leftIcon={<FiUpload />}
+                className="inline-flex items-center gap-2"
+                aria-label="Upload ID Card"
+              >
+                <span className="inline">Upload ID Card</span>
+              </Button>
+
+              {form.idCardURL && (
+                <div className="mt-2 w-full">
+                  <div className="mb-2">
+                    <Image
+                      src={form.idCardURL}
+                      alt="ID Card preview"
+                      width={800}
+                      height={450}
+                      className="w-full max-h-60 object-contain rounded"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Contract Doc section (bottom) */}
+          <div className="mb-4">
+            <input
+              ref={contractInputRef}
+              type="file"
+              accept="image/*,application/pdf"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                await uploadContractDoc(file);
+              }}
+            />
+
+            <div className="flex flex-col items-start gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="md"
+                onClick={() => contractInputRef.current?.click()}
+                leftIcon={<FiUpload />}
+                className="inline-flex items-center gap-2"
+                aria-label="Upload Contract Doc"
+              >
+                <span className="inline">Upload Contract Doc</span>
+              </Button>
+
+              {form.contractURL && (
+                <div className="mt-2 w-full">
+                  <div className="mb-2">
+                    <Image
+                      src={form.contractURL}
+                      alt="Contract preview"
+                      width={800}
+                      height={450}
+                      className="w-full max-h-60 object-contain rounded"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center justify-between gap-3">
