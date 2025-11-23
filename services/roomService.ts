@@ -102,6 +102,8 @@ export class RoomService {
       const newRoom: Partial<Iroom> = {
         name: roomName,
         type: roomInfo.type,
+        isFlatPriceWater: false,
+        waterPrice: 8, // Default water price
         status: EroomStatus.AVAILABLE,
         repairStatus: ErepairStatus.NONE,
         createdAt: new Date().toISOString(),
