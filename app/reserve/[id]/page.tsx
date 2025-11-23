@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import Input from "../../components/Input";
 import DateInput from "../../components/DateInput";
 import Button from "../../components/Button";
@@ -10,6 +11,7 @@ import toast, { Toaster } from "react-hot-toast";
 import axiosInstance from "../../axios/instance";
 import { getError, getResponse } from "../../utils/function";
 import reserveQuery from "@/app/axios/reserveQuery";
+import fileQuery from "@/app/axios/fileQuery";
 
 interface ReservationForm {
   id: string;
@@ -20,6 +22,7 @@ interface ReservationForm {
   reservePrice: number | "";
   securityPriceDate: string;
   securityPrice: number | "";
+  slipURL: string;
 }
 
 const ReservePage = () => {
@@ -39,7 +42,40 @@ const ReservePage = () => {
     reservePrice: "",
     securityPriceDate: "",
     securityPrice: "",
+    slipURL: "",
   });
+
+  const handleUploadEvidence = async (file: File) => {
+    if (!file) {
+      return null;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const { data, errorMessage } = await fileQuery.upload(
+      file,
+      `reservation_evidences_${roomID}`
+    );
+
+    if (errorMessage) {
+      toast.error(errorMessage || "Failed to upload evidence");
+      return;
+    }
+
+    const { errorMessage: errorMessageUpdateReservation } =
+      await reserveQuery.updateReserve(form.id, { slipURL: data?.url || "" });
+
+    if (errorMessageUpdateReservation) {
+      toast.error(
+        errorMessageUpdateReservation ||
+          "Failed to update reservation with evidence"
+      );
+      return;
+    }
+
+    toast.success("Evidence uploaded and reservation updated successfully");
+  };
 
   useEffect(() => {
     const fetchReservation = async () => {
@@ -66,6 +102,7 @@ const ReservePage = () => {
               ? new Date(data.securityPriceDate).toISOString().split("T")[0]
               : "",
             securityPrice: data.securityPrice || "",
+            slipURL: data.slipURL || "",
           });
         } else {
           toast.error(res.errorMessage || "Failed to load reservation");
@@ -183,7 +220,7 @@ const ReservePage = () => {
       )}
 
       <div className="w-full max-w-2xl bg-white dark:bg-zinc-800 rounded-2xl shadow p-6">
-        <h1 className="text-2xl font-semibold mb-4">Create Reservation</h1>
+        <h1 className="text-2xl font-semibold mb-4">Manage Reservation</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
@@ -253,6 +290,42 @@ const ReservePage = () => {
               required
               placeholder="0.00"
             />
+          </div>
+          {form.slipURL && (
+            <div className="mt-4 relative w-full h-96">
+              <Image
+                src={form.slipURL}
+                alt="Uploaded Slip"
+                fill
+                className="rounded-lg shadow-md object-contain"
+              />
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 gap-4">
+            <input
+              type="file"
+              id="evidenceFileInput"
+              className="hidden"
+              onChange={async (e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                  await handleUploadEvidence(e.target.files[0]);
+                }
+              }}
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                const fileInput = document.getElementById("evidenceFileInput");
+                if (fileInput) {
+                  fileInput.click();
+                }
+              }}
+              className="w-full"
+            >
+              Upload Evidence
+            </Button>
           </div>
 
           <div className="flex items-center justify-between gap-3">
