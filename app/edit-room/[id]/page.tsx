@@ -10,7 +10,9 @@ import Input from "../../components/Input";
 import Dropdown from "../../components/Dropdown";
 import Button from "../../components/Button";
 import Toggle from "../../components/Toggle";
+import ImageUploadBlock from "../../components/ImageUploadBlock";
 import { EroomType, EroomStatus } from "@/utils/enum";
+import fileQuery from "@/app/axios/fileQuery";
 
 const EditRoomPageWrapper = () => {
   return (
@@ -40,6 +42,12 @@ const EditRoomPage = () => {
   });
   const [isFlatPriceWater, setIsFlatPriceWater] = useState(false);
   const [waterPrice, setWaterPrice] = useState("");
+  const [images, setImages] = useState<(string | null)[]>([
+    null,
+    null,
+    null,
+    null,
+  ]);
 
   useEffect(() => {
     if (!id) return;
@@ -51,6 +59,15 @@ const EditRoomPage = () => {
           setForm(res.data as Partial<Iroom>);
           setIsFlatPriceWater(res.data.isFlatPriceWater);
           setWaterPrice(String(res.data.waterPrice));
+
+          // Ensure exactly 4 images are displayed
+          const fetchedImages = res.data.images || [];
+          setImages(
+            [
+              ...fetchedImages,
+              ...Array(4 - fetchedImages.length).fill(null),
+            ].slice(0, 4)
+          );
         } else {
           toast.error(res.errorMessage || "Failed to load room");
         }
@@ -121,9 +138,8 @@ const EditRoomPage = () => {
   const handleToggleChange = (value: boolean) => {
     setIsFlatPriceWater(value);
     if (value) {
-      setWaterPrice(""); // Reset water price when toggling
+      setWaterPrice("");
     }
-    // Call API to update room when toggle changes
     if (id) {
       const payload: Partial<Iroom> = {
         ...form,
@@ -132,6 +148,33 @@ const EditRoomPage = () => {
       };
       roomQuery.update(id, payload);
     }
+  };
+
+  const uploadImage = async (file: File, index: number) => {
+    const { data, errorMessage } = await fileQuery.upload(file, "room-images");
+    if (errorMessage) {
+      toast.error(errorMessage);
+      return null;
+    }
+
+    // Replace new image at the specific index
+    setImages((imgs) => {
+      const newImages = [...imgs];
+      newImages[index] = data?.url || null;
+      return newImages;
+    });
+
+    const { errorMessage: updateError } = await roomQuery.update(id, {
+      images: [...(form.images || []), data?.url],
+    });
+
+    if (updateError) {
+      toast.error(updateError);
+      return null;
+    }
+
+    toast.success("Image uploaded");
+    return data?.url || null;
   };
 
   return (
@@ -277,6 +320,20 @@ const EditRoomPage = () => {
             </Button>
           </div>
         </form>
+
+        <div className="mt-6">
+          <ImageUploadBlock
+            images={images}
+            handleUpload={async (file: File, index: number) => {
+              setLoading(true);
+              try {
+                await uploadImage(file, index);
+              } finally {
+                setLoading(false);
+              }
+            }}
+          />
+        </div>
       </div>
     </div>
   );
