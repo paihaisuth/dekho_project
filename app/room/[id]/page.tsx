@@ -22,7 +22,6 @@ import {
   FaWrench,
   FaWind,
   FaChevronLeft,
-  FaTint,
 } from "react-icons/fa";
 import Pagination from "../../components/Pagination";
 import { EroomStatus } from "@/utils/enum";
