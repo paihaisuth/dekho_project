@@ -106,11 +106,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (!loading) {
-      const publicPaths = ["/", "/register"];
+      const publicPaths = ["/", "/login", "/register"];
       const path = window.location.pathname;
 
       if (!isAuthenticated && !publicPaths.includes(path)) {
-        router.push("/");
+        router.push("/login");
       }
     }
   }, [isAuthenticated, loading, router]);

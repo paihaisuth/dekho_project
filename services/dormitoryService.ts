@@ -11,6 +11,12 @@ import {
 export class DormitoryService {
   constructor(private dormitoryRepository: IdormitoryRepository) {}
 
+  async publicList() {
+    {
+      return this.dormitoryRepository.publicList();
+    }
+  }
+
   async list(
     userID: string,
     filter: { name?: string },

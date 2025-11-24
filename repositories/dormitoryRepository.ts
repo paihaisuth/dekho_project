@@ -6,6 +6,17 @@ import { ObjectId } from "mongodb";
 export class DormitoryRepository implements IdormitoryRepository {
   constructor() {}
 
+  async publicList(): Promise<Idormitory[]> {
+    const dormitoryQuery = await dormitoryConnection
+      .find({})
+      .sort({ _id: -1 })
+      .toArray();
+
+    return dormitoryQuery.map((dormitoryData) =>
+      this.mapToIdormitory(dormitoryData)
+    );
+  }
+
   async list(
     userID: string,
     filter: { name?: string },

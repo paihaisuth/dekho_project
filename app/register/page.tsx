@@ -71,7 +71,7 @@ export default function RegisterPage() {
 
       // delay 3 seconds then redirect to /
       setTimeout(() => {
-        router.push("/");
+        router.push("/login");
       }, 3000);
       return;
     } catch (err: unknown) {

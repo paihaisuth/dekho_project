@@ -28,6 +28,7 @@ export interface IuserRepository {
 }
 
 export interface IdormitoryRepository {
+  publicList(): Promise<Idormitory[]>;
   list(
     userID: string,
     filter: { name?: string },
