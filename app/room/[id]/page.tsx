@@ -30,8 +30,6 @@ import Modal from "../../components/Modal";
 import { EroomType } from "@/utils/enum";
 
 function getIconByType(type: string) {
-  // Return a colorful icon depending on room `type`.
-  // Add more mappings as your backend returns more types.
   switch ((type || "").toUpperCase()) {
     case "FAN":
       return <FaWind className="text-blue-600" />;
@@ -331,7 +329,6 @@ function RoomPage() {
                 <div className="mt-2 flex items-center gap-2">
                   {getRepairBadge(room.repairStatus)}
                   {getStatusBadge(room.status)}
-                  {getWaterPriceModeBadge(room.isFlatPriceWater)}
                 </div>
               </div>
             ))}
@@ -415,19 +412,3 @@ function RoomPage() {
 }
 
 export default RoomPage;
-
-function getWaterPriceModeBadge(isFlatPriceWater?: boolean) {
-  if (isFlatPriceWater) {
-    return (
-      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-200 text-blue-900">
-        <FaBolt className="mr-1 text-blue-700" /> Flat Price
-      </span>
-    );
-  } else {
-    return (
-      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-cyan-200 text-cyan-900">
-        <FaTint className="mr-1 text-cyan-700" /> Per Unit
-      </span>
-    );
-  }
-}
