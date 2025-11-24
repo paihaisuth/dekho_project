@@ -19,6 +19,8 @@ import Modal from "../../components/Modal";
 import Input from "../../components/Input";
 import DateInput from "../../components/DateInput"; // Import the DateInput component
 import { toast, Toaster } from "react-hot-toast";
+import fileQuery from "@/app/axios/fileQuery";
+import Image from "next/image";
 
 // Define the DropdownOption type explicitly to match the Dropdown component's expectations
 const dropdownOptions: { label: string; value: EbillStatus | "ALL" }[] = [
@@ -75,21 +77,52 @@ const BillPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [paidDate, setPaidDate] = useState("");
   const [paidPrice, setPaidPrice] = useState("");
+  const [slipUploading, setSlipUploading] = useState(false);
 
-  // Ensure totalPages is updated dynamically based on the filtered results
+  const uploadBillSlip = async (file: File): Promise<void> => {
+    if (!file) {
+      toast.error("No file selected for upload.");
+      return;
+    }
+
+    const { data, errorMessage } = await fileQuery.upload(file, "bill-slips");
+
+    if (errorMessage) {
+      toast.error(`File upload failed: ${errorMessage}`);
+      return;
+    }
+
+    const { errorMessage: updateError } = await billQuery.update(
+      selectedBill!.id,
+      { slipURL: data?.url }
+    );
+
+    if (updateError) {
+      toast.error(`Failed to update bill with slip URL: ${updateError}`);
+      return;
+    }
+
+    toast.success("Slip uploaded and bill updated successfully.");
+
+    // Refresh bills to update slipURL
+    await fetchBills();
+
+    handleCloseModal();
+    return;
+  };
   const fetchBills = useCallback(async () => {
     if (!roomID) return;
 
     setLoading(true);
     try {
-      const statusFilter = filterStatus === "ALL" ? undefined : filterStatus; // Convert "ALL" to undefined
+      const statusFilter = filterStatus === "ALL" ? undefined : filterStatus;
       const response = await billQuery.list(roomID, page, undefined, {
         status: statusFilter,
-      }); // Pass as an object
+      });
       if (response.statusCode === 200 && response.data) {
         const { items, pageCount } = response.data;
         setBills(items);
-        setTotalPages(pageCount); // Dynamically update totalPages based on the API response
+        setTotalPages(pageCount);
       } else {
         console.error(response.errorMessage || "Failed to fetch bills.");
       }
@@ -98,7 +131,7 @@ const BillPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [roomID, page, filterStatus]); // Add filterStatus to dependencies
+  }, [roomID, page, filterStatus]);
 
   useEffect(() => {
     fetchBills();
@@ -316,6 +349,61 @@ const BillPage = () => {
             onChange={(e) => setPaidPrice(e.target.value)}
             placeholder="Enter paid amount"
           />
+
+          {/* Upload slip (local only, no API) */}
+          <div>
+            <input
+              type="file"
+              accept="image/*,application/pdf"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) {
+                  setSlipUploading(false);
+                  return;
+                }
+                setSlipUploading(true);
+                try {
+                  await uploadBillSlip(file);
+                } finally {
+                  setSlipUploading(false);
+                }
+              }}
+            />
+
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  (
+                    document.querySelector(
+                      'input[type="file"]'
+                    ) as HTMLInputElement
+                  )?.click()
+                }
+                loading={slipUploading}
+                leftIcon={undefined}
+              >
+                Upload Slip
+              </Button>
+            </div>
+          </div>
+
+          {selectedBill?.slipURL && (
+            <div className="mt-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Uploaded Slip:
+              </p>
+              <Image
+                src={selectedBill.slipURL}
+                alt="Uploaded Slip"
+                width={200}
+                height={200}
+                className="max-h-40 object-contain rounded"
+              />
+            </div>
+          )}
 
           <div className="flex gap-4 justify-end mt-6">
             <Button variant="ghost" onClick={handleCloseModal}>
