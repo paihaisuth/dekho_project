@@ -22,6 +22,8 @@ const ContractPage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [idCardUploading, setIdCardUploading] = useState(false);
+  const [contractUploading, setContractUploading] = useState(false);
   const [form, setForm] = useState({
     id: "",
     idCard: "",
@@ -39,54 +41,66 @@ const ContractPage = () => {
   const contractInputRef = useRef<HTMLInputElement | null>(null);
 
   const uploadIDCard = async (file: File) => {
-    const { data, errorMessage } = await fileQuery.upload(
-      file,
-      `contract/${roomID}`
-    );
+    setIdCardUploading(true);
+    try {
+      const { data, errorMessage } = await fileQuery.upload(
+        file,
+        `contract/${roomID}`
+      );
 
-    if (errorMessage) {
-      toast.error(`Failed to upload ID Card file`);
+      if (errorMessage) {
+        toast.error(`Failed to upload ID Card file`);
+        return;
+      }
+
+      const { errorMessage: errorMessageUpdateContract } =
+        await contractQuery.update(form.id, {
+          idCardURL: data?.url || "",
+        });
+
+      if (errorMessageUpdateContract) {
+        toast.error(`Failed to update contract with ID Card URL`);
+        return;
+      }
+
+      toast.success("ID Card uploaded successfully");
+      await fetchContract();
       return;
+    } finally {
+      setIdCardUploading(false);
     }
-
-    const { errorMessage: errorMessageUpdateContract } =
-      await contractQuery.update(form.id, {
-        idCardURL: data?.url || "",
-      });
-
-    if (errorMessageUpdateContract) {
-      toast.error(`Failed to update contract with ID Card URL`);
-      return;
-    }
-
-    toast.success("ID Card uploaded successfully");
-    return;
   };
 
   const uploadContractDoc = async (file: File) => {
-    const { data, errorMessage } = await fileQuery.upload(
-      file,
-      `contract/${roomID}`
-    );
+    setContractUploading(true);
+    try {
+      const { data, errorMessage } = await fileQuery.upload(
+        file,
+        `contract/${roomID}`
+      );
 
-    if (errorMessage) {
-      toast.error(`Failed to upload Contract Doc file`);
+      if (errorMessage) {
+        toast.error(`Failed to upload Contract Doc file`);
+        return;
+      }
+
+      const { errorMessage: errorMessageUpdateContract } =
+        await contractQuery.update(form.id, {
+          contractURL: data?.url || "",
+        });
+
+      if (errorMessageUpdateContract) {
+        toast.error(`Failed to update contract with Contract Doc URL`);
+        return;
+      }
+
+      toast.success("Contract Doc uploaded successfully");
+      await fetchContract();
+
       return;
+    } finally {
+      setContractUploading(false);
     }
-
-    const { errorMessage: errorMessageUpdateContract } =
-      await contractQuery.update(form.id, {
-        contractURL: data?.url || "",
-      });
-
-    if (errorMessageUpdateContract) {
-      toast.error(`Failed to update contract with Contract Doc URL`);
-      return;
-    }
-
-    toast.success("Contract Doc uploaded successfully");
-
-    return;
   };
 
   const fetchContract = useCallback(async () => {
@@ -226,10 +240,24 @@ const ContractPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-6 dark:bg-zinc-900">
       <Toaster position="top-center" />
-      {(loading || saving || deleting) && (
+      {(loading ||
+        saving ||
+        deleting ||
+        idCardUploading ||
+        contractUploading) && (
         <Loading
           overlay
-          text={loading ? "Loading..." : deleting ? "Deleting..." : "Saving..."}
+          text={
+            loading
+              ? "Loading..."
+              : idCardUploading
+              ? "Uploading ID Card..."
+              : contractUploading
+              ? "Uploading Contract..."
+              : deleting
+              ? "Deleting..."
+              : "Saving..."
+          }
         />
       )}
 
@@ -316,6 +344,7 @@ const ContractPage = () => {
                 variant="ghost"
                 size="md"
                 onClick={() => idCardInputRef.current?.click()}
+                loading={idCardUploading}
                 leftIcon={<FiUpload />}
                 className="inline-flex items-center gap-2"
                 aria-label="Upload ID Card"
@@ -359,6 +388,7 @@ const ContractPage = () => {
                 variant="ghost"
                 size="md"
                 onClick={() => contractInputRef.current?.click()}
+                loading={contractUploading}
                 leftIcon={<FiUpload />}
                 className="inline-flex items-center gap-2"
                 aria-label="Upload Contract Doc"
