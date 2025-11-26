@@ -15,7 +15,6 @@ import {
   FaExclamationTriangle,
   FaTools,
   FaDoorOpen,
-  FaPlus,
   FaClock,
   FaBolt,
   FaSnowflake,
@@ -27,6 +26,7 @@ import Pagination from "../../components/Pagination";
 import { EroomStatus } from "@/utils/enum";
 import Modal from "../../components/Modal";
 import { EroomType } from "@/utils/enum";
+import FloatingActionButton from "../../components/FloatingActionButton";
 
 function getIconByType(type: string) {
   switch ((type || "").toUpperCase()) {
@@ -261,17 +261,6 @@ function RoomPage() {
             }
             className="w-full sm:w-40"
           />
-
-          <Button
-            leftIcon={<FaPlus />}
-            onClick={() => router.push(`/new-room?dormitoryID=${dormitoryId}`)}
-            variant="primary"
-            size="md"
-            disabled={loading}
-            className="w-full sm:w-auto sm:ml-auto"
-          >
-            Create Room
-          </Button>
         </div>
       </div>
 
@@ -405,6 +394,10 @@ function RoomPage() {
         onPrevious={handlePreviousPage}
         onNext={handleNextPage}
         autoShow
+      />
+
+      <FloatingActionButton
+        onClick={() => router.push(`/new-room?dormitoryID=${dormitoryId}`)}
       />
     </div>
   );

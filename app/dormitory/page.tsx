@@ -7,7 +7,6 @@ import Loading from "../components/Loading";
 import toast, { Toaster } from "react-hot-toast";
 import { Idormitory } from "@/schema";
 import { useAuth } from "../context/AuthProvider";
-import { FaPlus } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import {
   FaMapMarkerAlt,
@@ -19,6 +18,7 @@ import Pagination from "../components/Pagination";
 import Modal, { useModal } from "../components/Modal";
 import Input from "../components/Input";
 import Button from "../components/Button";
+import FloatingActionButton from "../components/FloatingActionButton";
 
 interface IdormitoryDisplay {
   id: string;
@@ -211,7 +211,7 @@ const DormitoryPage = () => {
         <Loading overlay size="lg" />
       ) : (
         <div className="p-4">
-          <div className="flex flex-wrap justify-between items-center mb-4 gap-4 px-4">
+          <div className="flex flex-wrap items-center mb-4 gap-4 px-4">
             <div className="flex items-center gap-4 w-full sm:w-auto">
               <Input
                 value={searchTerm}
@@ -221,12 +221,6 @@ const DormitoryPage = () => {
               />
               <Button onClick={handleSearch}>Search</Button>
             </div>
-            <Button
-              leftIcon={<FaPlus />}
-              onClick={() => router.push("/new-dormitory")}
-            >
-              Create Dormitory
-            </Button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4">
             {dormitories.map((dormitory) => (
@@ -283,6 +277,8 @@ const DormitoryPage = () => {
           </div>
         </div>
       </Modal>
+
+      <FloatingActionButton />
 
       <BottomBarMenu />
     </div>
