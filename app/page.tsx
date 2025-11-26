@@ -59,10 +59,6 @@ const LandingPage = () => {
                   id={`dorm-${d.id}-title`}
                   className="flex items-center gap-3 text-lg sm:text-xl font-bold text-cyan-600 dark:text-cyan-400"
                 >
-                  <FiHome
-                    className="w-6 h-6 text-cyan-600 shrink-0"
-                    aria-hidden
-                  />
                   <span className="leading-tight">{d.name}</span>
                 </h2>
 

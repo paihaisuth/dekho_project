@@ -1,5 +1,6 @@
 import { generateAPIResponse } from "@/app/utils/function";
 import { DormitoryRepository } from "@/repositories/dormitoryRepository";
+import { RoomRepository } from "@/repositories/roomRepository";
 import { DormitoryService } from "@/services/dormitoryService";
 import { CustomError } from "@/utils/customError";
 
@@ -7,10 +8,11 @@ export const GET = async () => {
   try {
     console.log("========== [PUBLIC] START LIST DORMITORY ==========");
 
+    const roomRepository = new RoomRepository();
     const dormitoryRepository = new DormitoryRepository();
     const dormitoryService = new DormitoryService(dormitoryRepository);
 
-    const dormitoryList = await dormitoryService.publicList();
+    const dormitoryList = await dormitoryService.publicList(roomRepository);
 
     console.log("========== [PUBLIC] END LIST DORMITORY ==========");
     return generateAPIResponse(dormitoryList, 200);

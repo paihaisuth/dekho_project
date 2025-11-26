@@ -3,12 +3,19 @@ import { Iroom } from "@/schema";
 import {
   IfilterListRoom,
   IpaginationFormat,
+  IroomQueryFilter,
   IroomRepository,
 } from "@/utils/interface";
 import { Filter, ObjectId } from "mongodb";
 
 export class RoomRepository implements IroomRepository {
   constructor() {}
+
+  async query(filter: IroomQueryFilter): Promise<Iroom[]> {
+    const roomList = await roomConnection.find(filter).toArray();
+
+    return roomList.map((room) => this.mapToIroom(room));
+  }
 
   async list(
     dormitoryID: string,

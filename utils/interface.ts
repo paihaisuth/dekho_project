@@ -46,6 +46,7 @@ export interface IdormitoryRepository {
 }
 
 export interface IroomRepository {
+  query(filter: IroomQueryFilter): Promise<Iroom[]>;
   list(
     dormitoryID: string,
     filter: IfilterListRoom,
@@ -181,4 +182,13 @@ export interface IupdateBill {
 export interface IresponseUploadFile {
   url: string;
   key: string;
+}
+
+export interface IroomQueryFilter {
+  dormitoryID: string;
+  status: EroomStatus;
+}
+
+export interface IresponsePublicList extends Idormitory {
+  availableRoomCount: number;
 }

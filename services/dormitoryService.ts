@@ -1,9 +1,11 @@
 import { Idormitory } from "@/schema";
+import { EroomStatus } from "@/utils/enum";
 import {
   IbillRepository,
   IcontractRepository,
   IdormitoryRepository,
   IreservationRepository,
+  IresponsePublicList,
   IroomRepository,
   IuserRepository,
 } from "@/utils/interface";
@@ -11,9 +13,26 @@ import {
 export class DormitoryService {
   constructor(private dormitoryRepository: IdormitoryRepository) {}
 
-  async publicList() {
+  async publicList(
+    roomRepository: IroomRepository
+  ): Promise<IresponsePublicList[]> {
     {
-      return this.dormitoryRepository.publicList();
+      const dormitoryList = await this.dormitoryRepository.publicList();
+
+      const result: IresponsePublicList[] = [];
+      for (const dormitory of dormitoryList) {
+        const availableRoom = await roomRepository.query({
+          dormitoryID: dormitory.id,
+          status: EroomStatus.AVAILABLE,
+        });
+
+        result.push({
+          ...dormitory,
+          availableRoomCount: availableRoom.length,
+        });
+      }
+
+      return result;
     }
   }
 
