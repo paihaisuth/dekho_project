@@ -49,10 +49,14 @@ const AccountPage = () => {
   useEffect(() => {
     const fetchUser = async () => {
       setIsLoading(true);
-      if (!user?.userID) return;
+      if (!user?.userID) {
+        setIsLoading(false);
+        return;
+      }
       const { data, errorMessage } = await userQuery.getUser(
         user?.userID || ""
       );
+
       if (errorMessage) {
         toast.error(errorMessage);
         return;
