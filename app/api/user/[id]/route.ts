@@ -5,7 +5,7 @@ import { UserService } from "@/services/userService";
 import { CustomError } from "@/utils/customError";
 import { NextRequest } from "next/server";
 
-interface IbodyUpdateUser {
+export interface IbodyUpdateUser {
   name?: string;
   email?: string;
   password?: string;
