@@ -5,7 +5,7 @@ import Button from "../../components/Button";
 import Loading from "../../components/Loading";
 import Pagination from "../../components/Pagination";
 import { useRouter, useParams } from "next/navigation";
-import { FaChevronLeft, FaPlus, FaClock } from "react-icons/fa";
+import { FaChevronLeft, FaClock } from "react-icons/fa";
 import { EbillStatus } from "../../../utils/enum"; // Corrected import path
 import billQuery from "../../axios/billQuery";
 import {
@@ -21,6 +21,7 @@ import DateInput from "../../components/DateInput"; // Import the DateInput comp
 import { toast, Toaster } from "react-hot-toast";
 import fileQuery from "@/app/axios/fileQuery";
 import Image from "next/image";
+import FloatingActionButton from "../../components/FloatingActionButton";
 
 // Define the DropdownOption type explicitly to match the Dropdown component's expectations
 const dropdownOptions: { label: string; value: EbillStatus | "ALL" }[] = [
@@ -243,7 +244,7 @@ const BillPage = () => {
 
       {loading && <Loading overlay text="Loading bills..." />}
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center mb-6">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
@@ -265,15 +266,6 @@ const BillPage = () => {
             }
           />
         </div>
-
-        <Button
-          variant="primary"
-          size="md"
-          onClick={() => alert("Create Billing")}
-          leftIcon={<FaPlus />}
-        >
-          Create Billing
-        </Button>
       </div>
 
       {!loading && (
@@ -415,6 +407,8 @@ const BillPage = () => {
           </div>
         </div>
       </Modal>
+
+      <FloatingActionButton onClick={() => alert("Create Billing")} />
     </div>
   );
 };
