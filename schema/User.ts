@@ -7,6 +7,7 @@ interface Iuser {
   email: string;
   phoneNumber: string;
   roleID: string;
+  profileURL: string;
   createdAt: string;
   updatedAt: string;
 }

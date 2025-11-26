@@ -12,6 +12,7 @@ export interface IbodyUpdateUser {
   phoneNumber?: string;
   firstname?: string;
   lastname?: string;
+  profileURL?: string;
   roleID?: string;
 }
 

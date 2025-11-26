@@ -79,6 +79,7 @@ export class UserRepository implements IuserRepository {
       phoneNumber: userQuery.phoneNumber,
       username: userQuery.username,
       roleID: userQuery.roleID,
+      profileURL: userQuery.profileURL,
       passwordHash: userQuery.passwordHash,
       createdAt: userQuery.createdAt,
       updatedAt: userQuery.updatedAt,

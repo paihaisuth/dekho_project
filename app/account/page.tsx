@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import BottomBarMenu from "../components/BottomBarMenu";
 import Button from "../components/Button";
 import Input from "../components/Input";
@@ -10,6 +10,8 @@ import { Iuser } from "@/schema";
 import { userQuery } from "../axios/userQuery";
 import toast, { Toaster } from "react-hot-toast";
 import Loading from "../components/Loading";
+import fileQuery from "../axios/fileQuery";
+import Image from "next/image";
 
 const initialUser = {
   id: "",
@@ -20,6 +22,7 @@ const initialUser = {
   email: "",
   phoneNumber: "",
   roleID: "",
+  profileURL: "",
   createdAt: "",
   updatedAt: "",
 };
@@ -36,6 +39,8 @@ const AccountPage = () => {
     password: "",
     confirmPassword: "",
   });
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const initials = `${(userData.firstname || "").charAt(0)}${(
     userData.lastname || ""
@@ -90,6 +95,30 @@ const AccountPage = () => {
     setIsLoading(false);
   };
 
+  const handleUploadProfilePicture = async (file: File) => {
+    setIsLoading(true);
+    const { data, errorMessage } = await fileQuery.upload(file, "profile");
+    if (errorMessage) {
+      toast.error(errorMessage);
+      setIsLoading(false);
+      return;
+    }
+
+    const profileURL = data?.url || "";
+    const updateResponse = await userQuery.updateUser(user?.userID || "", {
+      profileURL,
+    });
+    if (updateResponse.errorMessage) {
+      toast.error(updateResponse.errorMessage);
+      setIsLoading(false);
+      return;
+    }
+
+    setUserData((prev) => ({ ...prev, profileURL }));
+    toast.success("Profile picture updated successfully");
+    setIsLoading(false);
+  };
+
   // Update Password Handler
   const handleUpdatePassword = async () => {
     if (passwordData.password !== passwordData.confirmPassword) {
@@ -137,18 +166,57 @@ const AccountPage = () => {
       <div className="py-4">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-full flex items-center justify-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-100 font-semibold ring-2 ring-blue-500">
-            {initials || "U"}
+            {userData.profileURL ? (
+              <Image
+                src={userData.profileURL}
+                alt="profile"
+                className="w-full h-full rounded-full object-cover"
+                width={56} // Adjust width as needed
+                height={56} // Adjust height as needed
+              />
+            ) : (
+              initials || "U"
+            )}
           </div>
+
+          {/* hidden file input for profile upload */}
+          <input
+            ref={fileInputRef}
+            id="profile-upload-input"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleUploadProfilePicture(file);
+              // reset so same file can be picked again if needed
+              e.currentTarget.value = "";
+            }}
+          />
+
           <div className="flex-1">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               {userData.firstname} {userData.lastname}
             </h2>
-            <span className="inline-block mt-1 px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100 border border-gray-200 dark:border-gray-600">
-              {user?.roleName || userData.roleID || "Unknown Role"}
-            </span>
+            <div className="flex items-center gap-3 mt-1">
+              <span className="inline-block px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100 border border-gray-200 dark:border-gray-600">
+                {user?.roleName || userData.roleID}
+              </span>
+              <div className="ml-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-sm px-2 py-1"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  Update profile
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
       {/* Personal Information Preview */}
       <div className="py-6">
         <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">
