@@ -8,11 +8,17 @@ import {
   Iuser,
 } from "@/schema";
 import { EbillStatus, ErepairStatus, EroomStatus, EroomType } from "./enum";
+import Ifile from "@/schema/File";
 
 // -------------------- Repository Interface --------------------
 
 export interface IfileRepository {
-  uploadFile(file: File, prefix?: string): Promise<IresponseUploadFile>;
+  uploadFile(
+    userID: string,
+    file: File,
+    prefix?: string
+  ): Promise<IresponseUploadFile>;
+  getByURL(url: string): Promise<Ifile | null>;
   deleteFile(key: string): Promise<void>;
 }
 

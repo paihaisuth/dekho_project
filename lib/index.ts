@@ -4,6 +4,7 @@ import { roomConnection } from "./roomConnection";
 import { contractConnection } from "./contractConnection";
 import { reservationConnection } from "./reservationConnection";
 import { billConnection } from "./billConnection";
+import { fileConnection } from "./fileConnection";
 
 export {
   userConnection,
@@ -12,4 +13,5 @@ export {
   contractConnection,
   reservationConnection,
   billConnection,
+  fileConnection,
 };

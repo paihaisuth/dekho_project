@@ -1,9 +1,16 @@
+import { fileConnection } from "@/lib";
+import Ifile from "@/schema/File";
 import { CustomError } from "@/utils/customError";
 import { IfileRepository, IresponseUploadFile } from "@/utils/interface";
 import { put, del } from "@vercel/blob";
+import { ObjectId } from "mongodb";
 
 export class FileRepository implements IfileRepository {
-  async uploadFile(file: File, prefix?: string): Promise<IresponseUploadFile> {
+  async uploadFile(
+    userID: string,
+    file: File,
+    prefix?: string
+  ): Promise<IresponseUploadFile> {
     // Check if file is provided
     if (!file) throw new CustomError("No file provided", 400);
 
@@ -30,7 +37,22 @@ export class FileRepository implements IfileRepository {
       contentType: file.type,
     });
 
+    const toCreate: Ifile = {
+      url: result.url,
+      key: fileName,
+      userID: userID,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    await fileConnection.insertOne(toCreate);
+
     return { url: result.url, key: fileName };
+  }
+
+  async getByURL(url: string): Promise<Ifile | null> {
+    const fileQuery = await fileConnection.findOne({ url: url });
+    return fileQuery ? this.mapToIfile(fileQuery) : null;
   }
 
   async deleteFile(key: string): Promise<void> {
@@ -65,5 +87,16 @@ export class FileRepository implements IfileRepository {
       .replace(/\s+/g, "_")
       .replace(/[^a-zA-Z0-9_\-\.]/g, "")
       .replace(/_+/g, "_");
+  }
+
+  private mapToIfile(fileData: Ifile & { _id: ObjectId }): Ifile {
+    return {
+      id: fileData._id.toString(),
+      url: fileData.url,
+      key: fileData.key,
+      userID: fileData.userID,
+      createdAt: fileData.createdAt,
+      updatedAt: fileData.updatedAt,
+    };
   }
 }

@@ -13,7 +13,7 @@ export const POST = async (req: NextRequest) => {
   try {
     console.log("========== START UPLOAD FILE ========== ");
 
-    await middleware(req);
+    const { id: userID } = await middleware(req);
 
     const formData = await req.formData();
     const file = formData.get("file") as File;
@@ -24,7 +24,11 @@ export const POST = async (req: NextRequest) => {
     const fileRepository = new FileRepository();
     const fileService = new FileService(fileRepository);
 
-    const uploadResult = await fileService.uploadFile(file, prefix || "");
+    const uploadResult = await fileService.uploadFile(
+      userID,
+      file,
+      prefix || ""
+    );
 
     console.log("========== END UPLOAD FILE ========== ");
     return generateAPIResponse(uploadResult, 201);
@@ -46,7 +50,7 @@ export const DELETE = async (req: NextRequest) => {
   try {
     console.log("========== START DELETE FILE ========== ");
 
-    await middleware(req);
+    const { id: userID } = await middleware(req);
 
     const { key } = await getBody<{ key: string }>(req);
 
@@ -55,7 +59,7 @@ export const DELETE = async (req: NextRequest) => {
     const fileRepository = new FileRepository();
     const fileService = new FileService(fileRepository);
 
-    await fileService.deleteFile(key);
+    await fileService.deleteFile(userID, key);
 
     console.log("========== END DELETE FILE ========== ");
     return generateAPIResponse({ message: "File deleted successfully" }, 200);
