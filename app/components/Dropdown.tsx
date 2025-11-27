@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa"; // Importing the React icon
+import { t } from "../i18n";
 
 interface DropdownOption {
   value: string;
@@ -15,6 +16,7 @@ interface DropdownProps {
   onChange?: (event: { target: { value: string } }) => void;
   disabled?: boolean;
   className?: string;
+  locale?: string;
 }
 
 export default function Dropdown({
@@ -24,6 +26,7 @@ export default function Dropdown({
   onChange,
   disabled,
   className,
+  locale = "en",
 }: DropdownProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -46,8 +49,8 @@ export default function Dropdown({
 
   const hasOptions = options.length > 0;
   const extendedOptions = hasOptions
-    ? [{ value: "", label: "Please select" }, ...options]
-    : [{ value: "", label: "No options" }];
+    ? [{ value: "", label: t(locale, "pleseSelect") }, ...options]
+    : [{ value: "", label: t(locale, "noOptions") }];
   const selected =
     (extendedOptions.find((o) => o.value === value) || {}).label || "";
 

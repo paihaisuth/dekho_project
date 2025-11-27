@@ -109,8 +109,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const publicPaths = ["/", "/login", "/register"];
       const path = window.location.pathname;
 
-      if (!isAuthenticated && !publicPaths.includes(path)) {
-        router.push("/login");
+      const localeMatch = path.match(/^\/([a-z]{2})\//);
+      const locale = localeMatch ? localeMatch[1] : "en";
+
+      const localizedPublicPaths = publicPaths.map((p) => `/${locale}${p}`);
+
+      if (!isAuthenticated && !localizedPublicPaths.includes(path)) {
+        router.push(`/${locale}`);
       }
     }
   }, [isAuthenticated, loading, router]);

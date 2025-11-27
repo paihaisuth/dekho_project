@@ -9,8 +9,9 @@ import {
   FaUserCircle,
   FaSignOutAlt,
 } from "react-icons/fa";
+import { t } from "../i18n";
 
-const BottomBarMenu = () => {
+const BottomBarMenu = ({ locale }: { locale: string }) => {
   const pathname = usePathname();
 
   const handleLogout = () => {
@@ -21,12 +22,20 @@ const BottomBarMenu = () => {
 
   const menuItems = [
     {
-      href: "/dashboard",
-      label: "Dashboard",
+      href: `/${locale}/dashboard`,
+      label: t(locale, "dashboard"),
       icon: <FaTachometerAlt size={24} />,
     },
-    { href: "/dormitory", label: "Dormitory", icon: <FaHome size={24} /> },
-    { href: "/account", label: "Account", icon: <FaUserCircle size={24} /> },
+    {
+      href: `/${locale}/dormitory`,
+      label: t(locale, "dormitory"),
+      icon: <FaHome size={24} />,
+    },
+    {
+      href: `/${locale}/account`,
+      label: t(locale, "account"),
+      icon: <FaUserCircle size={24} />,
+    },
   ];
 
   return (
@@ -51,7 +60,7 @@ const BottomBarMenu = () => {
             className="flex flex-col items-center text-sm text-gray-600 hover:text-red-500 cursor-pointer"
           >
             <FaSignOutAlt size={24} />
-            <span>Logout</span>
+            <span>{t(locale, "logout")}</span>
           </button>
         </li>
       </ul>

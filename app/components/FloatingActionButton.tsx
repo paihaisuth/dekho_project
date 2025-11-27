@@ -6,12 +6,14 @@ import { useRouter } from "next/navigation";
 
 interface FloatingActionButtonProps {
   onClick?: () => void;
+  locale: string;
   icon?: React.ReactNode;
   className?: string;
 }
 
 const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   onClick,
+  locale,
   icon = <FaPlus className="text-white text-xl" />,
   className = "",
 }) => {
@@ -22,7 +24,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
       onClick();
     } else {
       // Default action: navigate to create dormitory page
-      router.push("/new-dormitory");
+      router.push(`/${locale}/new-dormitory`);
     }
   };
 

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
+import { t } from "../i18n";
 
 type Option = { value: string; label: React.ReactNode };
 
@@ -12,11 +13,13 @@ type Props = {
   orientation?: "horizontal" | "vertical";
   size?: "sm" | "md";
   ariaLabel?: string;
+  locale?: string;
 };
 
 export default function Toggle({
   value,
   onChange,
+  locale = "en",
   options,
   className,
   orientation = "horizontal",
@@ -24,8 +27,8 @@ export default function Toggle({
   ariaLabel,
 }: Props) {
   const opts: Option[] = options ?? [
-    { value: "single", label: "Single" },
-    { value: "multiple", label: "Multiple" },
+    { value: "single", label: t(locale, "single") },
+    { value: "multiple", label: t(locale, "multiple") },
   ];
 
   const refs = useRef<Array<HTMLButtonElement | null>>([]);
