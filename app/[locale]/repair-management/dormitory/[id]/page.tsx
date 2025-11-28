@@ -134,7 +134,7 @@ const RepairManagementPage = () => {
             <div
               onClick={() => openModal(r)}
               key={r.id}
-              className="bg-white cursor-pointer dark:bg-zinc-800 rounded-lg shadow-md p-4 cursor-default hover:shadow-lg transition"
+              className="bg-white cursor-pointer dark:bg-zinc-800 rounded-lg shadow-md p-4 hover:shadow-lg transition"
             >
               <h3 className="text-xl font-bold mb-2 text-cyan-700 dark:text-cyan-400 flex items-center gap-2">
                 <FaWrench className="text-cyan-600" />
