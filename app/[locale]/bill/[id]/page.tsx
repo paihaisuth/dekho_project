@@ -23,6 +23,7 @@ import fileQuery from "@/app/axios/fileQuery";
 import Image from "next/image";
 // import FloatingActionButton from "../../../components/FloatingActionButton";
 import { t } from "@/app/i18n";
+import { useAuth } from "@/app/context/AuthProvider";
 
 // Define the DropdownOption type explicitly to match the Dropdown component's expectations
 const dropdownOptions: { label: string; value: EbillStatus | "ALL" }[] = [
@@ -71,6 +72,11 @@ const BillPage = () => {
   const params = useParams();
   const roomID = (params as { id?: string })?.id ?? "";
   const locale = params.locale as string;
+  const { user } = useAuth();
+
+  if (user?.roleName !== "owner") {
+    router.push(`/${locale}/`);
+  }
 
   const [loading, setLoading] = useState(true);
   const [bills, setBills] = useState<Ibill[]>([]);

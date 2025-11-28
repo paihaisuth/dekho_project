@@ -12,7 +12,7 @@ import toast, { Toaster } from "react-hot-toast";
 import Loading from "../../components/Loading";
 import fileQuery from "../../axios/fileQuery";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { t } from "../../i18n";
 
 const initialUser = {
@@ -34,6 +34,11 @@ const AccountPage = () => {
 
   const params = useParams();
   const locale = params?.locale as string;
+  const router = useRouter();
+
+  if (user?.roleName !== "owner") {
+    router.push(`/${locale}/`);
+  }
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isPersonalInfoModalOpen, setIsPersonalInfoModalOpen] = useState(false);

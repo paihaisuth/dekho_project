@@ -28,6 +28,7 @@ import Modal from "../../../components/Modal";
 import { EroomType } from "@/utils/enum";
 import FloatingActionButton from "../../../components/FloatingActionButton";
 import { t } from "@/app/i18n";
+import { useAuth } from "@/app/context/AuthProvider";
 
 function getIconByType(type: string) {
   switch ((type || "").toUpperCase()) {
@@ -111,6 +112,12 @@ function RoomPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [roomTypeFilter, setRoomTypeFilter] = useState("ALL");
   const [roomStatusFilter, setRoomStatusFilter] = useState("ALL");
+  const { user } = useAuth();
+
+  if (user?.roleName !== "owner") {
+    router.push(`/${locale}/`);
+  }
+
   const fetchRooms = useCallback(
     async (
       currentPage: number,

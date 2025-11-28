@@ -14,6 +14,7 @@ import ImageUploadBlock from "../../../components/ImageUploadBlock";
 import { EroomType, EroomStatus } from "@/utils/enum";
 import fileQuery from "@/app/axios/fileQuery";
 import { t } from "@/app/i18n";
+import { useAuth } from "@/app/context/AuthProvider";
 
 const EditRoomPageWrapper = () => {
   return (
@@ -28,6 +29,11 @@ const EditRoomPage = () => {
   const id = (params as { id?: string })?.id ?? "";
   const locale = params?.locale as string;
   const router = useRouter();
+  const { user } = useAuth();
+
+  if (user?.roleName !== "owner") {
+    router.push(`/${locale}/`);
+  }
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);

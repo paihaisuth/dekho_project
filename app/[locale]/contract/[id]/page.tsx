@@ -14,12 +14,18 @@ import { getError, getResponse } from "../../../utils/function";
 import contractQuery from "@/app/axios/contractQuery";
 import fileQuery from "@/app/axios/fileQuery";
 import { t } from "@/app/i18n";
+import { useAuth } from "@/app/context/AuthProvider";
 
 const ContractPage = () => {
   const params = useParams();
   const router = useRouter();
   const roomID = (params as { id?: string })?.id ?? "";
   const locale = (params as { locale?: string })?.locale ?? "en";
+  const { user } = useAuth();
+
+  if (user?.roleName !== "owner") {
+    router.push(`/${locale}/`);
+  }
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

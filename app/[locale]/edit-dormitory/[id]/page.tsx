@@ -53,6 +53,10 @@ export default function EditDormitoryPage() {
   const id = (params as { id?: string })?.id ?? "";
   const locale = params.locale as string;
 
+  if (user?.roleName !== "owner") {
+    router.push(`/${locale}/`);
+  }
+
   useEffect(() => {
     if (!id) return;
 

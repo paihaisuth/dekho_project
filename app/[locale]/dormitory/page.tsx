@@ -32,17 +32,20 @@ interface IdormitoryDisplay {
 }
 
 const DormitoryPage = () => {
+  const router = useRouter();
   const { user } = useAuth();
 
   const params = useParams();
   const locale = params.locale as string;
+
+  // Redirect if not owner
+  if (user?.roleName !== "owner") router.push(`/${locale}/`);
 
   const [dormitories, setDormitories] = useState<IdormitoryDisplay[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const router = useRouter();
 
   const fetchDormitories = useCallback(
     async (currentPage: number, filterName: string = "") => {

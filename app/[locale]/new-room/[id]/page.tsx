@@ -12,6 +12,7 @@ import { EroomType } from "@/utils/enum";
 import { useSearchParams, useRouter, useParams } from "next/navigation";
 import { useEffect } from "react";
 import { t } from "@/app/i18n";
+import { useAuth } from "@/app/context/AuthProvider";
 
 interface IcreateRoom {
   name: string;
@@ -50,13 +51,17 @@ function NewRoomPage() {
     routeDormitoryID || (searchParams?.get("dormitoryID") ?? "")
   );
   const locale = params.locale as string;
+  const { user } = useAuth();
+  const router = useRouter();
 
+  if (user?.roleName !== "owner") {
+    router.push(`/${locale}/`);
+  }
   useEffect(() => {
     setDormitoryID(
       routeDormitoryID || (searchParams?.get("dormitoryID") ?? "")
     );
   }, [routeDormitoryID, searchParams]);
-  const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<FormState>({
     name: "",

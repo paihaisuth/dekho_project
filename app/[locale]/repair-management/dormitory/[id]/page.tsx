@@ -17,6 +17,7 @@ import {
 import { t } from "@/app/i18n";
 import Modal from "@/app/components/Modal";
 import Button from "@/app/components/Button";
+import { useAuth } from "@/app/context/AuthProvider";
 
 interface IExtendedRepairRequest extends IrepairRequest {
   roomName?: string;
@@ -28,6 +29,11 @@ const RepairManagementPage = () => {
   const router = useRouter();
   const locale = params.locale as string;
   const dormitoryID = params.id as string;
+  const { user } = useAuth();
+
+  if (user?.roleName !== "owner") {
+    router.push(`/${locale}/`);
+  }
 
   const [repairRequests, setRepairRequests] = useState<
     IExtendedRepairRequest[]

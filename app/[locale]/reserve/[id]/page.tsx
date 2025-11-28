@@ -13,6 +13,7 @@ import { getError, getResponse } from "../../../utils/function";
 import reserveQuery from "@/app/axios/reserveQuery";
 import fileQuery from "@/app/axios/fileQuery";
 import { t } from "@/app/i18n";
+import { useAuth } from "@/app/context/AuthProvider";
 
 interface ReservationForm {
   id: string;
@@ -31,6 +32,11 @@ const ReservePage = () => {
   const router = useRouter();
   const roomID = (params as { id?: string })?.id ?? "";
   const locale = params.locale as string;
+  const { user } = useAuth();
+
+  if (user?.roleName !== "owner") {
+    router.push(`/${locale}/`);
+  }
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

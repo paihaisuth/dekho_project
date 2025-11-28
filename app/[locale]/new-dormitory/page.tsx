@@ -52,6 +52,10 @@ export default function NewDormitoryPage() {
   const { user } = useAuth();
   const router = useRouter();
 
+  if (user?.roleName !== "owner") {
+    router.push(`/${locale}/`);
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

@@ -11,6 +11,7 @@ import roomQuery from "../../axios/roomQuery";
 import { EroomType } from "../../../utils/enum";
 import { useSearchParams, useRouter, useParams } from "next/navigation";
 import { useEffect } from "react";
+import { useAuth } from "@/app/context/AuthProvider";
 
 interface IcreateRoom {
   name: string;
@@ -47,6 +48,8 @@ function NewRoomPage() {
     (params as { id?: string; dormitoryID?: string })?.id ??
     (params as { id?: string; dormitoryID?: string })?.dormitoryID ??
     "";
+  const locale = params.locale as string;
+  const { user } = useAuth();
   const [dormitoryID, setDormitoryID] = useState<string>(
     routeDormitoryID || (searchParams?.get("dormitoryID") ?? "")
   );
@@ -66,6 +69,10 @@ function NewRoomPage() {
     charLength: "",
   });
   const [mode, setMode] = useState<"single" | "multiple">("single");
+
+  if (user?.roleName !== "owner") {
+    router.push(`/${locale}/`);
+  }
 
   const handleChange = (key: keyof FormState, value: string | number | "") => {
     setForm((s) => ({ ...s, [key]: value }));
