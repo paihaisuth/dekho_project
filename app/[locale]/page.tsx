@@ -137,14 +137,14 @@ const LandingPage = () => {
           locale={locale}
           icon={<FiLogIn className="text-white text-xl" />}
           onClick={() => router.push(`/${locale}/login`)}
-          className="bg-zinc-600 hover:bg-zinc-700"
+          className="bg-blue-600 hover:bg-blue-700"
         />
 
         <FloatingActionButton
           locale={locale}
           icon={<FiUserPlus className="text-white text-xl" />}
           onClick={() => router.push(`/${locale}/register`)}
-          className=""
+          className="bg-orange-600 hover:bg-orange-700"
         />
 
         <FloatingActionButton
@@ -158,7 +158,7 @@ const LandingPage = () => {
             const newLocale = locale === "en" ? "th" : "en";
             router.push(`/${newLocale}`);
           }}
-          className="bg-gray-600 hover:bg-gray-700"
+          className="bg-green-600 hover:bg-green-700 w-14 h-14"
         />
       </div>
     </>

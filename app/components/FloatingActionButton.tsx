@@ -31,7 +31,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   return (
     <button
       onClick={handleClick}
-      className={`bg-cyan-600 hover:bg-cyan-700 text-white p-4 rounded-full shadow-lg transition-colors duration-200 ${className}`}
+      className={`flex items-center justify-center bg-cyan-600 hover:bg-cyan-700 text-white p-4 rounded-full shadow-lg transition-colors duration-200 ${className}`}
       aria-label="Create Dormitory"
     >
       {icon}
