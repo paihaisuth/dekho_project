@@ -9,6 +9,7 @@ import {
 } from "@/schema";
 import { EbillStatus, ErepairStatus, EroomStatus, EroomType } from "./enum";
 import Ifile from "@/schema/File";
+import IrepairRequest from "@/schema/RepairRequest";
 
 // -------------------- Repository Interface --------------------
 
@@ -112,6 +113,23 @@ export interface IroleRepository {
   createRole(roleInfo: Partial<Irole>): Promise<void>;
   updateRole(id: string, roleInfo: Partial<Irole>): Promise<void>;
   deleteRole(id: string): Promise<void>;
+}
+
+export interface IrepairRequestRepository {
+  list(
+    userID: string,
+    page: number,
+    pageSize: number
+  ): Promise<IpaginationFormat<IrepairRequest>>;
+  getByID(id: string): Promise<IrepairRequest | null>;
+  createRepairRequest(
+    repairRequestInfo: Partial<IrepairRequest>
+  ): Promise<void>;
+  updateRepairRequest(
+    id: string,
+    repairRequestInfo: Partial<IrepairRequest>
+  ): Promise<void>;
+  deleteRepairRequest(id: string): Promise<void>;
 }
 
 // -------------------- Other Interfaces --------------------

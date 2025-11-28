@@ -1,17 +1,19 @@
-import { dormitoryConnection } from "./dormitoryConnection";
-import { userConnection } from "./userConnection";
-import { roomConnection } from "./roomConnection";
-import { contractConnection } from "./contractConnection";
-import { reservationConnection } from "./reservationConnection";
 import { billConnection } from "./billConnection";
+import { contractConnection } from "./contractConnection";
+import { dormitoryConnection } from "./dormitoryConnection";
 import { fileConnection } from "./fileConnection";
+import { repairRequestConnection } from "./repairRequestConnection";
+import { reservationConnection } from "./reservationConnection";
+import { roomConnection } from "./roomConnection";
+import { userConnection } from "./userConnection";
 
 export {
-  userConnection,
-  dormitoryConnection,
-  roomConnection,
-  contractConnection,
-  reservationConnection,
   billConnection,
+  contractConnection,
+  dormitoryConnection,
   fileConnection,
+  repairRequestConnection,
+  reservationConnection,
+  roomConnection,
+  userConnection,
 };

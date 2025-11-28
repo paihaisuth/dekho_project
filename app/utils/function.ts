@@ -20,7 +20,9 @@ export const getBody = async <T>(request: NextRequest): Promise<T> => {
   }
 };
 
-export function getPagination(req: NextRequest) {
+export async function getPagination(
+  req: NextRequest
+): Promise<{ page: number; pageSize: number }> {
   const pageParam =
     req.nextUrl?.searchParams.get("page") ??
     new URL(req.url).searchParams.get("page");
