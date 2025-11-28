@@ -4,7 +4,7 @@ import { repairRequestQuery } from "@/app/axios";
 import Loading from "@/app/components/Loading";
 import Pagination from "@/app/components/Pagination";
 import IrepairRequest from "@/schema/RepairRequest";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import {
@@ -12,6 +12,7 @@ import {
   FaClock,
   FaInfoCircle,
   FaCalendarCheck,
+  FaArrowLeft,
 } from "react-icons/fa";
 import { t } from "@/app/i18n";
 import Modal from "@/app/components/Modal";
@@ -24,6 +25,7 @@ interface IExtendedRepairRequest extends IrepairRequest {
 
 const RepairManagementPage = () => {
   const params = useParams();
+  const router = useRouter();
   const locale = params.locale as string;
   const dormitoryID = params.id as string;
 
@@ -114,9 +116,17 @@ const RepairManagementPage = () => {
         </div>
       ) : null}
 
-      <h1 className="text-2xl font-bold mb-4">
-        {t(locale, "repairManagement")}
-      </h1>
+      <div className="flex items-center gap-4 mb-4">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.back()}
+          leftIcon={<FaArrowLeft />}
+        >
+          {t(locale, "back")}
+        </Button>
+        <h1 className="text-2xl font-bold">{t(locale, "repairManagement")}</h1>
+      </div>
 
       {repairRequests && repairRequests.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -124,7 +134,7 @@ const RepairManagementPage = () => {
             <div
               onClick={() => openModal(r)}
               key={r.id}
-              className="bg-white dark:bg-zinc-800 rounded-lg shadow-md p-4 cursor-default hover:shadow-lg transition"
+              className="bg-white cursor-pointer dark:bg-zinc-800 rounded-lg shadow-md p-4 cursor-default hover:shadow-lg transition"
             >
               <h3 className="text-xl font-bold mb-2 text-cyan-700 dark:text-cyan-400 flex items-center gap-2">
                 <FaWrench className="text-cyan-600" />
