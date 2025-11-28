@@ -1,5 +1,5 @@
 import { generateAPIResponse, getBody } from "@/app/utils/function";
-import { middleware } from "@/middleware";
+import { middleware, validateRole } from "@/middleware";
 import { RoleRepository } from "@/repositories/roleRepository";
 import { RoleService } from "@/services/roleService";
 import { CustomError } from "@/utils/customError";
@@ -17,6 +17,7 @@ export const GET = async (
     console.log("========== START GET ROLE BY ID ========== ");
 
     await middleware(req);
+    await validateRole("owner", req);
 
     const { id } = await params;
 
@@ -49,6 +50,7 @@ export const PUT = async (
     console.log("========== START UPDATE ROLE ========== ");
 
     await middleware(req);
+    await validateRole("owner", req);
 
     const { id } = await params;
     const roleInfo = await getBody<IbodyUpdateRole>(req);
@@ -81,6 +83,7 @@ export const DELETE = async (
     console.log("========== START DELETE ROLE ========== ");
 
     await middleware(req);
+    await validateRole("owner", req);
 
     const { id } = await params;
 

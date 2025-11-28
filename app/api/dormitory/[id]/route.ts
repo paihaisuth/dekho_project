@@ -1,5 +1,5 @@
 import { generateAPIResponse, getBody } from "@/app/utils/function";
-import { middleware } from "@/middleware";
+import { middleware, validateRole } from "@/middleware";
 import { BillRepository } from "@/repositories/billRepository";
 import { ContractRepository } from "@/repositories/contractRepository";
 import { DormitoryRepository } from "@/repositories/dormitoryRepository";
@@ -24,6 +24,7 @@ export const GET = async (
     console.log("========== START GET DORMITORY BY ID ========== ");
 
     await middleware(req);
+    await validateRole("owner", req);
 
     const { id } = await params;
 
@@ -55,6 +56,7 @@ export const PUT = async (
     console.log("========== START UPDATE DORMITORY ========== ");
 
     await middleware(req);
+    await validateRole("owner", req);
 
     const { id } = await params;
     const { address, name, billingDate, checkDate } =
@@ -96,6 +98,7 @@ export const DELETE = async (
     console.log("========== START DELETE DORMITORY ========== ");
 
     await middleware(req);
+    await validateRole("owner", req);
 
     const { id } = await params;
 

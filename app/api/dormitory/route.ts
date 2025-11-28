@@ -4,7 +4,7 @@ import {
   getPagination,
   getQueryString,
 } from "@/app/utils/function";
-import { middleware } from "@/middleware";
+import { middleware, validateRole } from "@/middleware";
 import { DormitoryRepository } from "@/repositories/dormitoryRepository";
 import { UserRepository } from "@/repositories/userRepository";
 import { DormitoryService } from "@/services/dormitoryService";
@@ -25,6 +25,7 @@ export const GET = async (req: NextRequest) => {
     console.log("========== START LIST DORMITORY ========== ");
 
     await middleware(req);
+    await validateRole("owner", req);
 
     const userID = await getQueryString(req, "userID");
     if (!userID) throw new CustomError("User ID is required", 400);
@@ -65,6 +66,7 @@ export const POST = async (req: NextRequest) => {
     console.log("========== START CREATE DORMITORY ========== ");
 
     await middleware(req);
+    await validateRole("owner", req);
 
     const {
       name,

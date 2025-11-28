@@ -4,7 +4,7 @@ import {
   getPagination,
   getQueryString,
 } from "@/app/utils/function";
-import { middleware } from "@/middleware";
+import { middleware, validateRole } from "@/middleware";
 import { DormitoryRepository } from "@/repositories/dormitoryRepository";
 import { RoomRepository } from "@/repositories/roomRepository";
 import { RoomService } from "@/services/roomService";
@@ -27,6 +27,7 @@ export const GET = async (req: NextRequest) => {
     console.log("========== START LIST ROOM ==========");
 
     await middleware(req);
+    await validateRole("owner", req);
 
     const dormitoryID = await getQueryString(req, "dormitoryID");
     if (!dormitoryID) throw new CustomError("Dormitory ID is required", 400);
@@ -66,6 +67,7 @@ export const POST = async (req: NextRequest) => {
     console.log("========== START CREATE ROOM ==========");
 
     await middleware(req);
+    await validateRole("owner", req);
 
     const { name, type, from, to, prefix, dormitoryID, charLength } =
       await getBody<IbodyCreateRoom>(req);

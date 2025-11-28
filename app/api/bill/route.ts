@@ -4,7 +4,7 @@ import {
   getPagination,
   getQueryString,
 } from "@/app/utils/function";
-import { middleware } from "@/middleware";
+import { middleware, validateRole } from "@/middleware";
 import { BillRepository } from "@/repositories/billRepository";
 import { ContractRepository } from "@/repositories/contractRepository";
 import { RoomRepository } from "@/repositories/roomRepository";
@@ -24,6 +24,7 @@ export const GET = async (req: NextRequest) => {
     console.log("========== START LIST BILL ========== ");
 
     await middleware(req);
+    await validateRole("owner", req);
 
     const roomID = getQueryString(req, "roomID");
     if (!roomID) throw new CustomError("Room ID is required", 400);
@@ -67,6 +68,7 @@ export const POST = async (req: NextRequest) => {
     console.log("========== START CREATE BILL ========== ");
 
     await middleware(req);
+    await validateRole("owner", req);
 
     const billData = await getBody<IbodyCreateBill>(req);
 

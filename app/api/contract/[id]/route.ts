@@ -1,5 +1,5 @@
 import { generateAPIResponse, getBody } from "@/app/utils/function";
-import { middleware } from "@/middleware";
+import { middleware, validateRole } from "@/middleware";
 import { BillRepository } from "@/repositories/billRepository";
 import { ContractRepository } from "@/repositories/contractRepository";
 import { RoomRepository } from "@/repositories/roomRepository";
@@ -15,6 +15,7 @@ export const GET = async (
   try {
     console.log("========== START GET CONTRACT BY ID ==========");
     await middleware(req);
+    await validateRole("owner", req);
     const { id } = await params;
     if (!id) throw new CustomError("Contract ID is required", 400);
 
@@ -47,6 +48,7 @@ export const PUT = async (
   try {
     console.log("========== START UPDATE CONTRACT ==========");
     await middleware(req);
+    await validateRole("owner", req);
     const { id } = await params;
     if (!id) throw new CustomError("Contract ID is required", 400);
 
@@ -83,6 +85,7 @@ export const DELETE = async (
   try {
     console.log("========== START DELETE CONTRACT ==========");
     await middleware(req);
+    await validateRole("owner", req);
     const { id } = await params;
     if (!id) throw new CustomError("Contract ID is required", 400);
 

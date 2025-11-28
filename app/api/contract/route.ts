@@ -1,5 +1,5 @@
 import { generateAPIResponse, getBody } from "@/app/utils/function";
-import { middleware } from "@/middleware";
+import { middleware, validateRole } from "@/middleware";
 import { BillRepository } from "@/repositories/billRepository";
 import { ContractRepository } from "@/repositories/contractRepository";
 import { DormitoryRepository } from "@/repositories/dormitoryRepository";
@@ -55,6 +55,7 @@ export const POST = async (req: NextRequest) => {
   try {
     console.log("========== START CREATE CONTRACT ==========");
     await middleware(req);
+    await validateRole("owner", req);
 
     const contractInfo = await getBody<IbodyCreateContract>(req);
 

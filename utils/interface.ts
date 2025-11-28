@@ -144,6 +144,7 @@ export interface IfilterListRepairRequest {
 export interface IresponseMiddleware {
   id: string;
   username: string;
+  roleName: string;
 }
 
 export interface Iregister {

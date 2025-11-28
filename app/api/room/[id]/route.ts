@@ -1,5 +1,5 @@
 import { generateAPIResponse, getBody } from "@/app/utils/function";
-import { middleware } from "@/middleware";
+import { middleware, validateRole } from "@/middleware";
 import { DormitoryRepository } from "@/repositories/dormitoryRepository";
 import { RoomRepository } from "@/repositories/roomRepository";
 import { Iroom } from "@/schema";
@@ -83,6 +83,7 @@ export const DELETE = async (
     console.log("========== START DELETE ROOM BY ID ==========");
 
     await middleware(req);
+    await validateRole("owner", req);
 
     const { id } = await params;
     if (!id) throw new CustomError("Room ID is required", 400);

@@ -3,7 +3,7 @@ import {
   getBody,
   getPagination,
 } from "@/app/utils/function";
-import { middleware } from "@/middleware";
+import { middleware, validateRole } from "@/middleware";
 import { RoleRepository } from "@/repositories/roleRepository";
 import { RoleService } from "@/services/roleService";
 import { CustomError } from "@/utils/customError";
@@ -18,6 +18,7 @@ export const POST = async (req: NextRequest) => {
     console.log("========== START CREATE ROLE ========== ");
 
     await middleware(req);
+    await validateRole("owner", req);
 
     const { name } = await getBody<IbodyCreateRole>(req);
 
@@ -45,6 +46,9 @@ export const POST = async (req: NextRequest) => {
 export const GET = async (req: NextRequest) => {
   try {
     console.log("========== START GET ROLE ========== ");
+
+    await middleware(req);
+    await validateRole("owner", req);
 
     const { page, pageSize } = await getPagination(req);
 
