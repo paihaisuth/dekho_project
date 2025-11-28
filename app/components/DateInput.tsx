@@ -152,7 +152,7 @@ export default function DateInput({
             aria-label="Day"
             value="DD"
             disabled
-            className="w-16 rounded-lg px-3 py-2 bg-gray-100 dark:bg-gray-800 text-sm text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 cursor-not-allowed"
+            className="w-12 sm:w-16 rounded-lg px-3 py-2 bg-gray-100 dark:bg-gray-800 text-sm text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 cursor-not-allowed"
           />
         ) : (
           <input
@@ -166,7 +166,7 @@ export default function DateInput({
             onKeyDown={handleKeyDownDay}
             required={required}
             aria-invalid={dayInvalid}
-            className={`w-16 rounded-lg px-3 py-2 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-cyan-200 dark:focus:ring-cyan-600 ${
+            className={`w-12 sm:w-16 rounded-lg px-3 py-2 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-cyan-200 dark:focus:ring-cyan-600 ${
               dayInvalid
                 ? "border-red-400 dark:border-red-600 ring-2 ring-red-300 dark:ring-red-700"
                 : "border border-zinc-200 dark:border-zinc-800"
@@ -183,7 +183,7 @@ export default function DateInput({
             aria-label="Month"
             value="XX"
             disabled
-            className="w-16 rounded-lg px-3 py-2 bg-gray-100 dark:bg-gray-800 text-sm text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 cursor-not-allowed"
+            className="w-12 sm:w-16 rounded-lg px-3 py-2 bg-gray-100 dark:bg-gray-800 text-sm text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 cursor-not-allowed"
           />
         ) : (
           <input
@@ -197,7 +197,7 @@ export default function DateInput({
             onKeyDown={handleKeyDownMonth}
             required={required}
             aria-invalid={monthInvalid}
-            className={`w-16 rounded-lg px-3 py-2 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-cyan-200 dark:focus:ring-cyan-600 ${
+            className={`w-12 sm:w-16 rounded-lg px-3 py-2 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-cyan-200 dark:focus:ring-cyan-600 ${
               monthInvalid
                 ? "border-red-400 dark:border-red-600 ring-2 ring-red-300 dark:ring-red-700"
                 : "border border-zinc-200 dark:border-zinc-800"
@@ -214,7 +214,7 @@ export default function DateInput({
             aria-label="Year"
             value="XXXX"
             disabled
-            className="w-28 rounded-lg px-3 py-2 bg-gray-100 dark:bg-gray-800 text-sm text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 cursor-not-allowed"
+            className="w-20 sm:w-28 rounded-lg px-3 py-2 bg-gray-100 dark:bg-gray-800 text-sm text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 cursor-not-allowed"
           />
         ) : (
           <input
@@ -228,7 +228,7 @@ export default function DateInput({
             onKeyDown={handleKeyDownYear}
             required={required}
             aria-invalid={false}
-            className={`w-28 rounded-lg px-3 py-2 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-cyan-200 dark:focus:ring-cyan-600 border border-zinc-200 dark:border-zinc-800`}
+            className={`w-20 sm:w-28 rounded-lg px-3 py-2 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-cyan-200 dark:focus:ring-cyan-600 border border-zinc-200 dark:border-zinc-800`}
           />
         )}
       </div>

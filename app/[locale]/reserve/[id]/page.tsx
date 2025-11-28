@@ -221,7 +221,7 @@ const ReservePage = () => {
         />
       )}
 
-      <div className="w-full max-w-2xl bg-white dark:bg-zinc-800 rounded-2xl shadow p-6">
+      <div className="w-full max-w-2xl bg-white dark:bg-zinc-800 rounded-2xl shadow p-4 md:p-6">
         <h1 className="text-2xl font-semibold mb-4">
           {t(locale, "reservationTitle")}
         </h1>
@@ -237,7 +237,7 @@ const ReservePage = () => {
             placeholder={t(locale, "enterIdCard")}
           />
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               label={t(locale, "firstName")}
               value={form.firstname}
@@ -258,7 +258,7 @@ const ReservePage = () => {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <DateInput
               label={t(locale, "reservePriceDate")}
               value={form.reservePriceDate}
@@ -277,7 +277,7 @@ const ReservePage = () => {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <DateInput
               label={t(locale, "securityPriceDate")}
               value={form.securityPriceDate}
@@ -296,7 +296,7 @@ const ReservePage = () => {
             />
           </div>
           {form.slipURL && (
-            <div className="mt-4 relative w-full h-96">
+            <div className="mt-4 relative w-full h-64 md:h-96">
               <Image
                 src={form.slipURL}
                 alt="Uploaded Slip"
@@ -332,7 +332,7 @@ const ReservePage = () => {
             </Button>
           </div>
 
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-3">
             <Button type="button" variant="ghost" onClick={() => router.back()}>
               {t(locale, "back")}
             </Button>
