@@ -36,9 +36,12 @@ const AccountPage = () => {
   const locale = params?.locale as string;
   const router = useRouter();
 
-  if (user?.roleName !== "owner") {
-    router.push(`/${locale}/`);
-  }
+  // Redirect if not owner
+  useEffect(() => {
+    if (user?.roleName !== "owner") {
+      router.push(`/${locale}/`);
+    }
+  }, [user, router, locale]);
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isPersonalInfoModalOpen, setIsPersonalInfoModalOpen] = useState(false);

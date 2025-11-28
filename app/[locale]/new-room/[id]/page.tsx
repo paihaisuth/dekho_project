@@ -54,9 +54,12 @@ function NewRoomPage() {
   const { user } = useAuth();
   const router = useRouter();
 
-  if (user?.roleName !== "owner") {
-    router.push(`/${locale}/`);
-  }
+  useEffect(() => {
+    if (user?.roleName !== "owner") {
+      router.push(`/${locale}/`);
+    }
+  }, [user, router, locale]);
+
   useEffect(() => {
     setDormitoryID(
       routeDormitoryID || (searchParams?.get("dormitoryID") ?? "")

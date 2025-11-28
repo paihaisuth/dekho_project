@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
 import { dormitoryQuery } from "../../axios";
@@ -52,9 +52,12 @@ export default function NewDormitoryPage() {
   const { user } = useAuth();
   const router = useRouter();
 
-  if (user?.roleName !== "owner") {
-    router.push(`/${locale}/`);
-  }
+  // Redirect if not owner
+  useEffect(() => {
+    if (user?.roleName !== "owner") {
+      router.push(`/${locale}/`);
+    }
+  }, [user, router, locale]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

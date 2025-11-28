@@ -23,9 +23,11 @@ const ContractPage = () => {
   const locale = (params as { locale?: string })?.locale ?? "en";
   const { user } = useAuth();
 
-  if (user?.roleName !== "owner") {
-    router.push(`/${locale}/`);
-  }
+  useEffect(() => {
+    if (user?.roleName !== "owner") {
+      router.push(`/${locale}/`);
+    }
+  }, [user, router, locale]);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

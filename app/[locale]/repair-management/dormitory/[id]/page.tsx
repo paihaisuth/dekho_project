@@ -31,9 +31,12 @@ const RepairManagementPage = () => {
   const dormitoryID = params.id as string;
   const { user } = useAuth();
 
-  if (user?.roleName !== "owner") {
-    router.push(`/${locale}/`);
-  }
+  // Redirect if not owner
+  useEffect(() => {
+    if (user?.roleName !== "owner") {
+      router.push(`/${locale}/`);
+    }
+  }, [user, router, locale]);
 
   const [repairRequests, setRepairRequests] = useState<
     IExtendedRepairRequest[]

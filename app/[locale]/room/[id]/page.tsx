@@ -114,9 +114,12 @@ function RoomPage() {
   const [roomStatusFilter, setRoomStatusFilter] = useState("ALL");
   const { user } = useAuth();
 
-  if (user?.roleName !== "owner") {
-    router.push(`/${locale}/`);
-  }
+  // Redirect if not owner
+  useEffect(() => {
+    if (user?.roleName !== "owner") {
+      router.push(`/${locale}/`);
+    }
+  }, [user, router, locale]);
 
   const fetchRooms = useCallback(
     async (

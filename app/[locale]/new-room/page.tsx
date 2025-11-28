@@ -70,9 +70,12 @@ function NewRoomPage() {
   });
   const [mode, setMode] = useState<"single" | "multiple">("single");
 
-  if (user?.roleName !== "owner") {
-    router.push(`/${locale}/`);
-  }
+  // Redirect if not owner
+  useEffect(() => {
+    if (user?.roleName !== "owner") {
+      router.push(`/${locale}/`);
+    }
+  }, [user, router, locale]);
 
   const handleChange = (key: keyof FormState, value: string | number | "") => {
     setForm((s) => ({ ...s, [key]: value }));

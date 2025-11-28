@@ -39,7 +39,11 @@ const DormitoryPage = () => {
   const locale = params.locale as string;
 
   // Redirect if not owner
-  if (user?.roleName !== "owner") router.push(`/${locale}/`);
+  useEffect(() => {
+    if (user?.roleName !== "owner") {
+      router.push(`/${locale}/`);
+    }
+  }, [user, router, locale]);
 
   const [dormitories, setDormitories] = useState<IdormitoryDisplay[]>([]);
   const [loading, setLoading] = useState(true);

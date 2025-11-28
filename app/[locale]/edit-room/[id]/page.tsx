@@ -31,9 +31,12 @@ const EditRoomPage = () => {
   const router = useRouter();
   const { user } = useAuth();
 
-  if (user?.roleName !== "owner") {
-    router.push(`/${locale}/`);
-  }
+  // Redirect if not owner
+  useEffect(() => {
+    if (user?.roleName !== "owner") {
+      router.push(`/${locale}/`);
+    }
+  }, [user, router, locale]);
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);

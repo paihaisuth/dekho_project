@@ -74,9 +74,12 @@ const BillPage = () => {
   const locale = params.locale as string;
   const { user } = useAuth();
 
-  if (user?.roleName !== "owner") {
-    router.push(`/${locale}/`);
-  }
+  // Redirect if not owner
+  useEffect(() => {
+    if (user?.roleName !== "owner") {
+      router.push(`/${locale}/`);
+    }
+  }, [user, router, locale]);
 
   const [loading, setLoading] = useState(true);
   const [bills, setBills] = useState<Ibill[]>([]);
