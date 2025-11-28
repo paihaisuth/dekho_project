@@ -6,6 +6,7 @@ import Input from "@/app/components/Input";
 import { dormitoryQuery } from "@/app/axios";
 import axiosInstance from "@/app/axios/instance";
 import Loading from "@/app/components/Loading";
+import Button from "@/app/components/Button";
 import { useAuth } from "@/app/context/AuthProvider";
 import toast from "react-hot-toast";
 import { t } from "@/app/i18n";
@@ -177,34 +178,40 @@ export default function EditDormitoryPage() {
           </div>
 
           <div className="flex items-center justify-between mt-6">
-            <button
+            <Button
               type="button"
+              variant="secondary"
+              size="sm"
               onClick={() => window.history.back()}
-              className="px-5 py-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-700 focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-600"
+              className="focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-600"
             >
               {t(locale, "back")}
-            </button>
+            </Button>
 
             <div className="flex items-center gap-4">
-              <button
+              <Button
                 type="button"
+                variant="secondary"
+                size="sm"
                 onClick={() => {
                   setDormName("");
                   setAddress("");
                   setBillingDate("");
                   setCheckDate("");
                 }}
-                className="px-5 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-sm font-medium hover:bg-zinc-200 dark:hover:bg-zinc-700 focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
+                className="focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
               >
                 {t(locale, "reset")}
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type="submit"
-                className="px-5 py-2 rounded-lg bg-cyan-600 text-white text-sm font-medium hover:bg-cyan-700 focus:ring-2 focus:ring-cyan-400"
+                variant="primary"
+                size="sm"
+                className="focus:ring-2 focus:ring-cyan-400"
               >
                 {t(locale, "save")}
-              </button>
+              </Button>
             </div>
           </div>
         </form>
