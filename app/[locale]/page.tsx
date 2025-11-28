@@ -1,18 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { FiMapPin, FiEye, FiLayers, FiCheckCircle } from "react-icons/fi";
+import {
+  FiMapPin,
+  FiLayers,
+  FiCheckCircle,
+  FiLogIn,
+  FiUserPlus,
+} from "react-icons/fi";
 import toast, { Toaster } from "react-hot-toast";
 import { IresponsePublicList } from "@/utils/interface";
 import { publicQuery } from "../axios/publicQuery";
 import Loading from "../components/Loading";
-import NavBar from "../components/NavBar";
-import { useParams } from "next/navigation";
+import FloatingActionButton from "../components/FloatingActionButton";
+import { useParams, useRouter } from "next/navigation";
 import { t } from "../i18n";
 
 const LandingPage = () => {
   const params = useParams();
+  const router = useRouter();
   const locale = params?.locale as string;
 
   const [loading, setLoading] = useState(true);
@@ -40,7 +46,6 @@ const LandingPage = () => {
 
   return (
     <>
-      <NavBar locale={locale} />
       <Toaster position="top-center" />
       {loading && <Loading overlay />}
 
@@ -125,6 +130,37 @@ const LandingPage = () => {
           </div>
         )}
       </main>
+
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-4 right-4 flex flex-col gap-3 z-50">
+        <FloatingActionButton
+          locale={locale}
+          icon={<FiLogIn className="text-white text-xl" />}
+          onClick={() => router.push(`/${locale}/login`)}
+          className="bg-zinc-600 hover:bg-zinc-700"
+        />
+
+        <FloatingActionButton
+          locale={locale}
+          icon={<FiUserPlus className="text-white text-xl" />}
+          onClick={() => router.push(`/${locale}/register`)}
+          className=""
+        />
+
+        <FloatingActionButton
+          locale={locale}
+          icon={
+            <span className="text-white text-sm font-bold">
+              {locale === "en" ? "TH" : "EN"}
+            </span>
+          }
+          onClick={() => {
+            const newLocale = locale === "en" ? "th" : "en";
+            router.push(`/${newLocale}`);
+          }}
+          className="bg-gray-600 hover:bg-gray-700"
+        />
+      </div>
     </>
   );
 };
