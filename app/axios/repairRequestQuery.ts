@@ -2,13 +2,18 @@ import IrepairRequest from "@/schema/RepairRequest";
 import { getError, getResponse } from "../utils/function";
 import { IpaginationFormat } from "../utils/interface";
 import axiosInstance from "./instance";
+import { IfilterListRepairRequest } from "@/utils/interface";
 
 const repairRequestQuery = {
-  async list(userID: string, page: number, pageSize: number = 10) {
+  async list(
+    filter: IfilterListRepairRequest,
+    page: number,
+    pageSize: number = 10
+  ) {
     try {
       const response = await axiosInstance.get(`/repairRequest`, {
         params: {
-          userID,
+          filter: JSON.stringify(filter),
           page,
           pageSize,
         },

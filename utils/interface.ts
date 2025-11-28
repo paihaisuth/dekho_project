@@ -117,7 +117,7 @@ export interface IroleRepository {
 
 export interface IrepairRequestRepository {
   list(
-    userID: string,
+    filter: IfilterListRepairRequest,
     page: number,
     pageSize: number
   ): Promise<IpaginationFormat<IrepairRequest>>;
@@ -133,6 +133,13 @@ export interface IrepairRequestRepository {
 }
 
 // -------------------- Other Interfaces --------------------
+
+export interface IfilterListRepairRequest {
+  status?: boolean;
+  userID?: string;
+  roomID?: string;
+  dormitoryID?: string;
+}
 
 export interface IresponseMiddleware {
   id: string;

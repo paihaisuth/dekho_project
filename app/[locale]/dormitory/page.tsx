@@ -264,6 +264,19 @@ const DormitoryPage = () => {
 
             <Button
               variant="secondary"
+              onClick={() => {
+                if (!selectedDormitory) return;
+                closeDormModal();
+                router.push(
+                  `/${locale}/repair-management/dormitory/${selectedDormitory.id}`
+                );
+              }}
+            >
+              {t(locale, "repairManagement")}
+            </Button>
+
+            <Button
+              variant="secondary"
               onClick={() =>
                 selectedDormitory && handleEditDormitory(selectedDormitory.id)
               }

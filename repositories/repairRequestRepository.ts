@@ -1,18 +1,24 @@
 import { repairRequestConnection } from "@/lib";
 import IrepairRequest from "@/schema/RepairRequest";
-import { IpaginationFormat, IrepairRequestRepository } from "@/utils/interface";
+import {
+  IfilterListRepairRequest,
+  IpaginationFormat,
+  IrepairRequestRepository,
+} from "@/utils/interface";
 import { ObjectId } from "mongodb";
 
 export class RepairRequestRepository implements IrepairRequestRepository {
   async list(
-    userID: string,
+    filter: IfilterListRepairRequest,
     page: number,
     pageSize: number
   ): Promise<IpaginationFormat<IrepairRequest>> {
     const skip = (page - 1) * pageSize;
-    const total = await repairRequestConnection.countDocuments({ userID });
+
+    const total = await repairRequestConnection.countDocuments(filter);
+
     const items = await repairRequestConnection
-      .find({ userID })
+      .find(filter)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(pageSize)
@@ -72,6 +78,7 @@ export class RepairRequestRepository implements IrepairRequestRepository {
       fixDate: data.fixDate,
       userID: data.userID,
       roomID: data.roomID,
+      dormitoryID: data.dormitoryID,
       status: data.status,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,

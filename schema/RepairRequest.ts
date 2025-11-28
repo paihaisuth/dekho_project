@@ -4,6 +4,7 @@ interface IrepairRequest {
   fixDate: string;
   userID: string;
   roomID: string;
+  dormitoryID: string;
   status: boolean;
   createdAt: string;
   updatedAt: string;
